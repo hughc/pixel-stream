@@ -1,0 +1,19 @@
+{
+  "name": "pixel-stream-server",
+  "version": "1.0.0",
+  "description": "supplies RGB values, as JSON arries to drive an LED strip",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.0",
+    "fs-extra": "^9.0.1",
+    "sharp": "^0.25.4",
+    "underscore": "^1.10.2"
+  }
+}

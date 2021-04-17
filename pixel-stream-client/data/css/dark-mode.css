@@ -1,0 +1,63 @@
+[data-theme="dark"] {
+  background-color: #111 !important;
+  color: #aaa;
+}
+
+[data-theme="dark"] .bg-light {
+  background-color: #333 !important;
+}
+
+[data-theme="dark"] .bg-white {
+  background-color: #000 !important;
+}
+
+[data-theme="dark"] .bg-black {
+  background-color: #eee !important;
+}
+
+[data-theme="dark"] a {
+  color: #FFF !important;
+}
+
+[data-theme="dark"] img {
+  filter: invert(100%);
+}
+
+[data-theme="dark"]  input {
+  background-color: #333 !important;
+  border-color:#444 !important;
+  color: #fff;
+}
+
+[data-theme="dark"]  .form-control {
+  background-color: #333 !important;
+  border-color:#444 !important;
+  color: #fff;
+}
+
+[data-theme="dark"]  .btn-primary {
+  background-color: #143e66 !important;
+  color: #fff;
+}
+
+[data-theme="dark"]  .btn-default:not(.btn-color) {
+  background-color: #333 !important;
+  color: #fff;
+}
+
+[data-theme="dark"]  hr, button {
+  border-color: #666 !important;
+}
+
+[data-theme="dark"]  .minicolors-panel {
+  background: transparent !important;
+  border: none !important;
+}
+
+.slider {
+	margin-top: 3px !important;
+}
+
+.btn-group {
+	margin-top: 3px !important;
+}
