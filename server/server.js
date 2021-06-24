@@ -12,7 +12,7 @@ var calculateMatrix = (size) => {
     return colIndex + size * index;
   });
   if (index % 2) col.reverse();
-  return col;
+  return col.reverse();
 });
 
 return _.flatten(rows);
@@ -105,10 +105,11 @@ app.get("/image", (req, res) => {
   return dataP.then((dataObj) => {
     //		console.log('data ' + dataObj.data);
     data = dataObj.data;
+		data.reverse();
     var rgb = _.compact(
       _.map(data, (dp, index) => {
         if (index % 3) return;
-        return [dp, data[index + 1], data[index + 2]];
+        return [data[index + 2] , data[index + 1], dp];
       })
     );
     //		console.log(rgb);

@@ -16,15 +16,12 @@
 */
 
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
-#include <WiFiClient.h>
 #include <ESP8266HTTPClient.h>
-#include <ArduinoJson.h>
+#include <WiFiClient.h>
 
-  
-#include "JsonStreamingParser.h"
-#include "JsonListener.h"
-#include "ExampleParser.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "FastLED.h"
 
@@ -62,145 +59,163 @@ CRGB leds[NUM_LEDS];
 
 #define FRAMES_PER_SECOND 60
 
-char jsonURL[50] = "http://192.168.0.35:3000/image?size=4";
+String jsonURL = "http://192.168.0.35:3000/image";
 //strcat(jsonURL, SQUARE_SIZE);
-
 
 const char *ssid = STASSID;
 const char *password = STAPSK;
 
+HTTPClient http;
+
+uint8_t RGBValues[NUM_LEDS * 3]; // string array to store the result
 
 void getImage()
 {
 
-	HTTPClient http;
+  // Send request
+  // http.begin(jsonURL);
+  // http.GET();
 
-	// Send request
-	http.begin(jsonURL);
-	http.GET();
+  String serverPath = jsonURL + "?size=" + SQUARE_SIZE;
 
- JsonStreamingParser parser;
-  ExampleListener listener;
+  Serial.print("serverPath: ");
+  Serial.println(serverPath);
+  // Your Domain name with URL path or IP address with path
+  http.begin(serverPath.c_str());
 
-  parser.setListener(&listener);
+  // Send HTTP GET request
+  int httpResponseCode = http.GET();
+  Serial.print("HTTP Response code: ");
+  Serial.println(httpResponseCode);
+  String payload = http.getString();
+  //   Serial.println(payload);
 
-  WiFiClient& stream = http.getStream();
-  int total;
-  total = stream.available();
+  // Free resources
+  http.end();
 
-   
-  Serial.print("total stream size: ");
-  Serial.println(total);
+  // Serial.print("total stream length: ");
+  // Serial.println(payload.length());
 
+  // Serial.println("remaining heap: ");
+  // Serial.println(ESP.getFreeHeap(), DEC);
+  //return;
+  char *cstr = new char[payload.length() + 1];
+  strcpy(cstr, payload.c_str());
 
-  while (stream.available() > 0 ) { char jsonString = stream.read(); 
-  //Serial.println(jsonString);
-  // parser.parse(jsonString); 
-   
-  Serial.print("stream left: ");
-  Serial.println(stream.available());
- }
+  uint16_t foundValues = 0; // declaring i and assign  to 0
+  char *pt;
+  pt = strtok(cstr, ",");
+  while (pt != NULL)
+  {
+    int a = atoi(pt);
+    //   printf("%d: %d\n", i, a);
+    RGBValues[foundValues] = (uint8_t)a;
+    foundValues++;
+    pt = strtok(NULL, ",");
+  }
 
-  
-  Serial.println("stream parsed");
+  delete cstr;
 
+  Serial.print("stream parsed, found values: ");
+  Serial.println(foundValues);
+  Serial.print("remaining heap: ");
+  Serial.println(ESP.getFreeHeap(), DEC);
 
+  uint8_t red;
+  uint8_t green;
+  uint8_t blue;
 
-	//	DynamicJsonDocument doc(2048);
-//	const size_t capacity = JSON_ARRAY_SIZE(50);
-//	DynamicJsonDocument doc(capacity);
-//	deserializeJson(doc, http.getStream());
-//	JsonArray outerArray = doc.as<JsonArray>();
+  for (int whichRGB = 0; whichRGB < foundValues - 1; whichRGB++)
+  {
+    if (whichRGB % 3 == 0)
+    {
 
+    //  Serial.println(ESP.getFreeHeap(), DEC);
 
+      red = RGBValues[whichRGB];
+      green = RGBValues[whichRGB + 1];
+      blue = RGBValues[whichRGB + 2];
 
- 
-	Serial.print("outerArray size: ");
-	//Serial.println(listener.pixelValues[0]);
-
-	// Read values
-	//uint16_t count = 0;
-	
-	for (int i = 0; i < 3072; i++) {
-		if (i % 3 == 0)
-		{
-			uint8_t red = (uint8_t)listener.pixelValues[i];
-			uint8_t green = (uint8_t)listener.pixelValues[i + 1];
-			uint8_t blue = (uint8_t)listener.pixelValues[i + 2];
-			leds[i / 3] = CRGB(red, green, blue);
-
-//
-//			Serial.print("rgb: ");
-//			Serial.print(red);
-//			Serial.print(",");
-//			Serial.print(green);
-//			Serial.print(",");
-//			Serial.println(blue);
-		}
- //    Serial.print("count: ");
- //     Serial.println(count);
-		//count++;
-	}
-     Serial.print("done, i: ");
-//      Serial.println(i);
-	http.end();
+      
+    Serial.print(whichRGB);
+    Serial.print(": ");
+    Serial.print(red);
+    Serial.print(",");
+    Serial.print(green);
+    Serial.print(",");
+    Serial.println(blue);
+    
+      leds[whichRGB / 3] = CRGB(red, green, blue);
+    }
+  }
+  Serial.println("done setting ");
+  Serial.println("------------");
+  Serial.println("");
+  FastLED.show();
 }
 
 void setup(void)
 {
-	Serial.begin(115200);
+  Serial.begin(115200);
 
-	// tell FastLED about the LED strip configuration
-	FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-	//FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  // tell FastLED about the LED strip configuration
+  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  // FastLED.addLeds<LED_TYPE, DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
-	// set master brightness control
-	FastLED.setBrightness(BRIGHTNESS);
+  // set master brightness control
+    FastLED.setBrightness(BRIGHTNESS);
 
-	// Connect to WiFi network
-	WiFi.mode(WIFI_STA);
-	WiFi.begin(ssid, password);
+  
+  fill_solid(leds, NUM_LEDS, CRGB::Red);
+  //  fill_solid(blocks, , CRGB::Black);
+  FastLED.show();
+    
+  // Connect to WiFi network
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.println("");
+
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+
+		fill_solid(leds, NUM_LEDS, CRGB::Yellow);
+		//  fill_solid(blocks, , CRGB::Black);
+		FastLED.show();
+		Serial.print(">");
+  }
+
+  // allow reuse (if server supports it)
+  http.setReuse(true);
+
+	fill_solid(leds, NUM_LEDS, CRGB::Green);
+	//  fill_solid(blocks, , CRGB::Black);
+	FastLED.show();
+
 	Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
 
-	// Wait for connection
-	while (WiFi.status() != WL_CONNECTED)
-	{
-		delay(500);
-		Serial.print(".");
-	}
-	Serial.println("");
-	Serial.print("Connected to ");
-	Serial.println(ssid);
-	Serial.print("IP address: ");
-	Serial.println(WiFi.localIP());
-
-	// Set up mDNS responder:
-	// - first argument is the domain name, in this example
-	//   the fully-qualified domain name is "esp8266.local"
-	// - second argument is the IP address to advertise
-	//   we send our IP address on the WiFi network
-	if (!MDNS.begin("esp8266"))
-	{
-		Serial.println("Error setting up MDNS responder!");
-		while (1)
-		{
-			delay(1000);
-		}
-	}
-	Serial.println("mDNS responder started");
-
-	getImage();
+  getImage();
 }
 
 void loop(void)
 {
-	EVERY_N_SECONDS(2)
-	{
-	//	FastLED.show();
-	}
-	EVERY_N_SECONDS(10)
-	{
-		getImage();
-	}
+  EVERY_N_SECONDS(2)
+  {
+ //  Serial.println("-- main loop 2 --");
+ //   FastLED.show();
+  }
+  EVERY_N_SECONDS(10)
+  {
+    getImage();
+//    Serial.println("-- main loop --");
+    //  getImage();
 
+//    Serial.print("remaining heap: ");
+//    Serial.println(ESP.getFreeHeap(), DEC);
+  }
 }
