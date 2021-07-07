@@ -1,0 +1,63 @@
+.l-col--1 {
+  width: 493px;
+  max-width: 493px;
+  &-m {
+    width: 543px;
+    max-width: 543px;
+  }
+}
+.l-col--2 {
+  width: 1087px;
+  max-width: 1087px;
+}
+
+.l-grid {
+  display: flex;
+  position: relative;
+  flex: 1;
+  &__col {
+    @extend .l-grid;
+    flex-direction: column;
+    &--reverse {
+      @extend .l-grid__col;
+      flex-direction: column-reverse;
+    }
+  }
+
+  &__row {
+    @extend .l-grid;
+    flex-direction: row;
+    &--reverse {
+      @extend .l-grid__row;
+      flex-direction: row-reverse;
+    }
+  }
+
+  &--fixed {
+    // use this when you want to define the width/height of a column/row
+    flex: none;
+  }
+
+  @for $i from 1 through 40 {
+    // user gutter for specific row/column gaps
+    &--gutter-#{$i*5} {
+      &.l-grid__col {
+        margin-right: $i * 5px;
+      }
+      &.l-grid__row {
+        margin-bottom: $i * 5px;
+      }
+    }
+    // use gap on container to define gaps at the top level
+    &--col-gap-#{$i*5} {
+      > .l-grid__col:not(:last-of-type) {
+        margin-right: $i * 5px;
+      }
+    }
+    &--row-gap-#{$i*5} {
+      > .l-grid__row:not(:last-of-type) {
+        margin-bottom: $i * 5px;
+      }
+    }
+  }
+}

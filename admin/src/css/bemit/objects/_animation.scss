@@ -1,0 +1,58 @@
+@keyframes elasticScale {
+  0% {
+    transform: scale(0);
+    animation-timing-function: $easeout;
+  }
+  60% {
+    transform: scale(1.1);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.o-anim {
+  &--elastic-scale {
+    transform-origin: center center;
+    transform: scale(0);
+  }
+}
+
+// trigger animations (fired when arriving at the slide)
+.slide-rendered {
+  .o-anim {
+    &--elastic-scale {
+      animation: elasticScale 500ms 1 forwards;
+    }
+
+    &__duration {
+      @for $i from 1 through 50 {
+        $j: $i * 50;
+        &--#{$j} {
+          animation-duration: #{$j}ms;
+        }
+      }
+    }
+
+    &__delay {
+      @for $i from 1 through 50 {
+        $j: $i * 50;
+        &--#{$j} {
+          animation-delay: #{$j}ms;
+        }
+      }
+    }
+  }
+}
+
+// Turn off animations for PDF/thumbnail screenshotting
+.animation-complete,
+.edit-mode #slideshow {
+  .o-anim {
+    &--elastic-scale {
+      animation: none !important;
+      transform: scale(1) !important;
+    }
+  }
+}

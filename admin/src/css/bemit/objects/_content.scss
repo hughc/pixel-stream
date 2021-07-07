@@ -1,0 +1,28 @@
+.o-content {
+  position: relative;
+  flex: 1;
+  width: $slide-width;
+  display: flex;
+  flex-direction: column;
+  &__body {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    padding: 0 $pagepad;
+    &--no-pad {
+      padding: 0;
+    }
+    &--double-pad {
+      padding: 0 2 * $pagepad;
+    }
+  }
+  &--no-header {
+    margin-top: $header-height + $pagepad-top;
+  }
+  &--no-footer {
+    margin-bottom: $footer-height;
+  }
+  &--has-header {
+    margin-top: -$header-height;
+  }
+}

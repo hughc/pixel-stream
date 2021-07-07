@@ -1,0 +1,9 @@
+$displayTypes: (block, inline-block, table, none);
+
+.u-display {
+  @each $display in $displayTypes {
+    &--#{$display} {
+      display: #{$display};
+    }
+  }
+}

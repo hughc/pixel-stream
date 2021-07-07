@@ -1,0 +1,230 @@
+.o-transition {
+  $child-transition-delay: 100ms;
+  $transition-duration: 600ms;
+
+  &--fade {
+    opacity: 0;
+    transition: opacity $transition-duration $easeout;
+  }
+
+  &__children--fade > * {
+    @extend .o-transition--fade;
+  }
+
+  @each $direction in $directions {
+    &--slide-#{$direction} {
+      position: relative;
+      #{$direction}: 100%;
+      transition: #{$direction} $transition-duration $easeout;
+    }
+
+    &__children--slide-#{$direction} > * {
+      @extend .o-transition--slide-#{$direction};
+    }
+  }
+
+  &--fade-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity $transition-duration $easeout, transform $transition-duration $easeout;
+    perspective: 1px;
+  }
+
+  &__children--fade-up > * {
+    @extend .o-transition--fade-up;
+  }
+
+  &--fade-up-exag,
+  &__children--fade-up-exag > * {
+    @extend .o-transition--fade-up;
+    transform: translateY(100px);
+  }
+
+  &--fade-down {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity $transition-duration $easeout, transform $transition-duration $easeout;
+    perspective: 1px;
+  }
+
+  &__children--fade-down > * {
+    @extend .o-transition--fade-down;
+  }
+
+  &--fade-down-exag,
+  &__children--fade-down-exag > * {
+    @extend .o-transition--fade-down;
+    transform: translateY(-100px);
+  }
+
+  &--fade-left {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity $transition-duration $easeout, transform $transition-duration $easeout;
+    perspective: 1px;
+  }
+
+  &__children--fade-left > * {
+    @extend .o-transition--fade-left;
+  }
+
+  &--fade-left-exag,
+  &__children--fade-left-exag > * {
+    @extend .o-transition--fade-left;
+    transform: translateX(-100px);
+  }
+
+  &--fade-right {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity $transition-duration $easeout, transform $transition-duration $easeout;
+    perspective: 1px;
+  }
+
+  &__children--fade-right > * {
+    @extend .o-transition--fade-right;
+  }
+
+  &--fade-right-exag,
+  &__children--fade-right-exag > * {
+    @extend .o-transition--fade-right;
+    transform: translateX(100px);
+  }
+
+  &--fade-scale {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: transform $transition-duration $easeout;
+    perspective: 1px;
+  }
+
+  &__children--fade-scale > * {
+    @extend .o-transition--fade-scale;
+  }
+
+  &--scale-full {
+    transform: scale(0);
+    transition: transform 800ms $easeout;
+    perspective: 1px;
+  }
+
+  &__children--scale-full > * {
+    @extend .o-transition--scale-full;
+  }
+
+  // Children
+  &__children {
+    @for $c from 1 through 20 {
+      $child-delay: ($c - 1) * $child-transition-delay;
+      > :nth-child(#{$c}) {
+        transition-delay: $child-delay;
+      }
+    }
+  }
+
+  &__delay {
+    @for $i from 1 through 50 {
+      $j: $i * 100;
+
+      &--#{$j} {
+        transition-delay: #{$j}ms;
+
+        &.o-transition__children {
+          @for $c from 1 through 20 {
+            $child-delay: ($c - 1) * $child-transition-delay + $j;
+            > :nth-child(#{$c}) {
+              transition-delay: $child-delay;
+            }
+          }
+          
+            // customise the delay between child animations
+            &.o-transition__stagger {
+              @for $s from 1 through 500 {
+                @if $s % 300 == 0 {
+                  &--#{$s} {
+                    @for $c from 1 through 20 {
+                      $child-delay: ($c - 1) * $s * 1ms + $j;
+                      > :nth-child(#{$c}) {
+                        transition-delay: $child-delay;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        }
+      }
+    }
+  }
+  &__duration {
+    @for $i from 1 through 100 {
+      $j: $i * 50;
+
+      &--#{$j} {
+        transition-duration: #{$j}ms;
+
+        &.o-transition__children > * {
+          transition-duration: #{$j}ms;
+        }
+      }
+    }
+  }
+}
+
+// end state for animations (fired when arriving at the slide)
+.slide-rendered {
+  &:not(.o-transition__subslides),
+  .currentpage {
+    .o-transition {
+      &--fade {
+        opacity: 1;
+      }
+      &--fade-up,
+      &--fade-down {
+        opacity: 1;
+        transform: translateY(0px);
+      }
+      &--fade-right,
+      &--fade-left {
+        opacity: 1;
+        transform: translateX(0px);
+      }
+      &--fade-scale {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      &--scale-full {
+        transform: scale(1);
+      }
+
+      @each $direction in $directions {
+        &--slide-#{$direction} {
+          #{$direction}: 0;
+        }
+      }
+    }
+  }
+}
+
+// Turn off animations for PDF/thumbnail screenshotting
+.animation-complete,
+.edit-mode #slideshow {
+  .o-transition {
+    &--fade,
+    &--fade-up,
+    &--fade-down,
+    &--fade-right,
+    &--fade-left,
+    &--fade-scale,
+    &--scale-full {
+      transition: none !important;
+    }
+
+    @each $direction in $directions {
+      &--slide-#{$direction} {
+        transition: none !important;
+      }
+    }
+  }
+}

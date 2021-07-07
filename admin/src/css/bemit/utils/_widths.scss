@@ -1,0 +1,26 @@
+.u-w--1 {
+  width: 100%;
+}
+
+.u-w--slide {
+  width: $slide-width;
+}
+
+@for $i from 2 through 25 {
+  @for $j from 1 through $i - 1 {
+    .u-w--#{$j}\/#{$i} {
+      width: 100% / $i * $j;
+    }
+    .u-mw--#{$j}\/#{$i} {
+      max-width: 100% / $i * $j;
+      width: 100%;
+    }
+  }
+}
+@for $i from 10 through 250 {
+  @if $i%10 {
+    .u-w--#{$i} {
+      width: $i * 1px;
+    }
+  }
+}

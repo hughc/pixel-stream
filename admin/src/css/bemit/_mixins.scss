@@ -1,0 +1,664 @@
+//----------------------------------------------------------------------------//
+//--- Easing Variables -------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+$easeInSine: cubic-bezier(0.47, 0, 0.745, 0.715);
+$easeOutSine: cubic-bezier(0.39, 0.575, 0.565, 1);
+$easeInOutSine: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+
+$easeInQuad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+$easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$easeInOutQuad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+
+$easeInCubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+$easeOutCubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+$easeInOutCubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+
+$easeInQuart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+$easeOutQuart: cubic-bezier(0.165, 0.84, 0.44, 1);
+$easeInOutQuart: cubic-bezier(0.77, 0, 0.175, 1);
+
+$easeInQuint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+$easeOutQuint: cubic-bezier(0.23, 1, 0.32, 1);
+$easeInOutQuint: cubic-bezier(0.86, 0, 0.07, 1);
+
+$easeInExpo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
+$easeOutExpo: cubic-bezier(0.19, 1, 0.22, 1);
+$easeInOutExpo: cubic-bezier(1, 0, 0, 1);
+
+$easeInCirc: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+$easeOutCirc: cubic-bezier(0.075, 0.82, 0.165, 1);
+$easeInOutCirc: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+
+$easeInBack: cubic-bezier(0.6, -0.28, 0.735, 0.045);
+$easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+$easeInOutBack: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+// Material design ease out
+$easeout: cubic-bezier(0, 0, 0.2, 1);
+
+//------//
+
+// Optional hyphenation
+@mixin hyphens($mode: auto) {
+  word-wrap: break-word;
+  hyphens: $mode;
+}
+
+@mixin clear() {
+  &:before,
+  &:after {
+    content: "\0020";
+    display: block;
+    height: 0;
+    overflow: hidden;
+  }
+  &:after {
+    clear: both;
+  }
+
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin cursor($setting: pointer) {
+  cursor: $setting;
+  .client & {
+    cursor: default;
+  }
+}
+
+@mixin clearfix() {
+  @include clear();
+}
+
+@mixin hidetext() {
+  font: 0/0 a;
+  text-shadow: none;
+  color: transparent;
+}
+
+@mixin no-selection() {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@mixin afterBlock() {
+  font-size: 0.75rem;
+  line-height: 0.6rem;
+  padding-top: 0.45rem;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+  height: 0.75rem;
+  position: absolute;
+  right: 0;
+  bottom: 0.1rem;
+  border: 0.25rem solid $white;
+  display: block;
+}
+
+@mixin multiline-ellipsis($height, $lineheight, $ellipsiswidth) {
+  $ellipsiswidth: 3em !global;
+
+  .ellipsis {
+    overflow: hidden;
+    height: $height;
+    line-height: $lineheight;
+  }
+
+  .ellipsis:before {
+    content: "";
+    float: left;
+    width: 5px;
+    height: $height;
+  }
+
+  .ellipsis > *:first-child {
+    float: right;
+    width: 100%;
+    margin-left: -5px;
+  }
+
+  .ellipsis:after {
+    content: "\02026";
+
+    float: right;
+    position: relative;
+    top: -14px;
+    left: 100%;
+    width: $ellipsiswidth;
+    margin-left: -$ellipsiswidth;
+    padding-right: 5px;
+
+    text-align: right;
+  }
+}
+
+// --------------------------------------------------------
+// arrows
+// --------------------------------------------------------
+// $direction: top, left, right, bottom, top-left, top-right, bottom-left, bottom-right
+// $color: hex, rgb or rbga
+// $size: px or em
+// @example
+// .element{
+//     @include arrow(top, #000, 50px);
+// }
+@mixin arrow($direction, $color, $size) {
+  display: block;
+  height: 0;
+  width: 0;
+
+  @if $direction == "top" {
+    border-left: $size solid transparent;
+    border-right: $size solid transparent;
+    border-bottom: $size solid $color;
+  } @else if $direction == "right" {
+    border-top: $size solid transparent;
+    border-bottom: $size solid transparent;
+    border-left: $size solid $color;
+  } @else if $direction == "bottom" {
+    border-top: $size solid $color;
+    border-right: $size solid transparent;
+    border-left: $size solid transparent;
+  } @else if $direction == "left" {
+    border-top: $size solid transparent;
+    border-right: $size solid $color;
+    border-bottom: $size solid transparent;
+  } @else if $direction == "top-left" {
+    border-top: $size solid $color;
+    border-right: $size solid transparent;
+  } @else if $direction == "top-right" {
+    border-top: $size solid $color;
+    border-left: $size solid transparent;
+  } @else if $direction == "bottom-left" {
+    border-bottom: $size solid $color;
+    border-right: $size solid transparent;
+  } @else if $direction == "bottom-right" {
+    border-bottom: $size solid $color;
+    border-left: $size solid transparent;
+  }
+}
+
+// --------------------------------------------------------
+// Breakpoints
+// --------------------------------------------------------
+// Good for the following
+// $feature: min-width $value: n
+// $feature: max-width $value: n
+// $feature: min-height $value: n
+// $feature: max-height $value: n
+// $feature: orientation $value: portrait/landscape
+// $feature: device-aspect-ratio $value: 16/9
+// $feature: min-device-width $value: 640px
+// $feature: min-device-height $value: 480px
+
+@mixin respond-rule($feature, $value, $media: screen) {
+  @media only #{$media} and ($feature: $value) {
+    @content;
+  }
+}
+
+// For cases where two features are required
+
+@mixin respond-rule-two($feature, $value, $feature2, $value2, $media: screen) {
+  @media only #{$media} and ($feature: $value) and ($feature2: $value2) {
+    @content;
+  }
+}
+
+// Retina display Media Query
+@mixin retina-only($imageURL) {
+  @media only screen and (-webkit-min-device-pixel-ratio: 2),
+    only screen and (min--moz-device-pixel-ratio: 2),
+    only screen and (-o-min-device-pixel-ratio: 2/1),
+    only screen and (min-device-pixel-ratio: 2),
+    only screen and (min-resolution: 192dpi),
+    only screen and (min-resolution: 2dppx) {
+    background-image: $imageURL;
+  }
+}
+
+@mixin retina-background-image(
+  $image,
+  $format: "png",
+  $upgrade: false,
+  $suffix: "-retina"
+) {
+  @if $upgrade == false {
+    background-image: url($image+"."+$format);
+  }
+
+  @include retina-only(url($image+$suffix+"."+$format));
+}
+
+@mixin retina-background-div(
+  $truewidth,
+  $trueheight,
+  $actualwidth,
+  $image,
+  $format: "png",
+  $upgrade: false,
+  $suffix: "-retina"
+) {
+  $proportions: $trueheight/$truewidth;
+  $height: round($actualwidth * $proportions);
+
+  @include retina-background-image($image, $format, $upgrade, $suffix);
+
+  width: $actualwidth;
+  height: $height;
+  background-size: $actualwidth $height;
+}
+
+// not so retina display Media Query
+@mixin background-image($image) {
+  background-image: url($image);
+}
+
+@mixin background-div($truewidth, $trueheight, $actualwidth, $image) {
+  $proportions: $trueheight/$truewidth;
+  $height: round($actualwidth * $proportions);
+
+  @include background-image($image);
+
+  width: $actualwidth;
+  height: $height;
+  background-size: $actualwidth $height;
+}
+
+@mixin svg-background-div-within-height(
+  $truewidth,
+  $trueheight,
+  $actualwidth,
+  $image,
+  $desiredHeight,
+  $alignment: "middle"
+) {
+  @include svg-background-div($truewidth, $trueheight, $actualwidth, $image);
+
+  $proportions: $trueheight/$truewidth;
+  $height: round($actualwidth * $proportions);
+  $difference: $desiredHeight - $height;
+  height: $desiredHeight;
+  background-repeat: no-repeat;
+
+  @if $alignment == "middle" {
+    background-position: 50%;
+  } @else if $alignment == "top" {
+    background-position: 50% 0;
+  } @else if $alignment == "bottom" {
+    background-position: 50% 100%;
+  }
+}
+
+@mixin svg-background-div($truewidth, $trueheight, $actualwidth, $image) {
+  $proportions: $trueheight/$truewidth;
+  $height: round($actualwidth * $proportions);
+
+  background-image: url($image);
+  background-position: 50%;
+  background-repeat: no-repeat;
+
+  width: $actualwidth;
+  height: $height;
+  background-size: $actualwidth $height;
+}
+
+@mixin svg-before-div(
+  $truewidth,
+  $trueheight,
+  $actualwidth,
+  $image,
+  $position: relative,
+  $offset: 5px,
+  $top: 0
+) {
+  position: $position;
+  padding-left: $actualwidth + $offset;
+
+  &:before {
+    content: "";
+    position: absolute;
+    left: -($offset);
+    top: $top;
+    @include svg-background-div($truewidth, $trueheight, $actualwidth, $image);
+  }
+}
+
+@mixin svg-after-div(
+  $truewidth,
+  $trueheight,
+  $actualwidth,
+  $image,
+  $position: relative,
+  $offset: 5px,
+  $top: 0
+) {
+  position: $position;
+  padding-right: $actualwidth + 2 * $offset;
+  &:after {
+    content: "";
+    position: absolute;
+    right: $offset;
+    top: $top;
+    @include svg-background-div($truewidth, $trueheight, $actualwidth, $image);
+  }
+}
+
+/*  fluff up a button to ipad-friendly size */
+
+@mixin min-hit-area(
+  $originalWidth,
+  $originalHeight,
+  $position: after,
+  $hitArea: 60px
+) {
+  $minWidth: $hitArea;
+  $minHeight: $hitArea;
+  $padLR: ceil(-($minWidth - $originalWidth)/2);
+  $padTB: ceil(-($minHeight - $originalHeight)/2);
+
+  @if ($position == after) {
+    &:after {
+      content: "";
+      position: absolute;
+      @if ($minWidth > $originalWidth) {
+        left: $padLR;
+        right: $padLR;
+      } @else {
+        left: 0;
+        right: 0;
+      }
+      @if ($minHeight > $originalHeight) {
+        top: $padTB;
+        bottom: $padTB;
+      } @else {
+        top: 0;
+        bottom: 0;
+      }
+    }
+  }
+  @if ($position == before) {
+    &:before {
+      content: "";
+      position: absolute;
+      @if ($minWidth > $originalWidth) {
+        left: $padLR;
+        right: $padLR;
+      } @else {
+        left: 0;
+        right: 0;
+      }
+      @if ($minHeight > $originalHeight) {
+        top: $padTB;
+        bottom: $padTB;
+      } @else {
+        top: 0;
+        bottom: 0;
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------//
+//--- Gradient Functions -----------------------------------------------------//
+//----------------------------------------------------------------------------//
+// Functions required to use linear and radial gradients                      //
+//----------------------------------------------------------------------------//
+@function _linear-positions-parser($pos) {
+  $type: type-of(nth($pos, 1));
+  $spec: null;
+  $degree: null;
+  $side: null;
+  $corner: null;
+  $length: length($pos);
+  // Parse Side and corner positions
+  @if ($length > 1) {
+    @if nth($pos, 1) == "to" {
+      // Newer syntax
+      $side: nth($pos, 2);
+
+      @if $length == 2 {
+        // eg. to top
+        // Swap for backwards compatability
+        $degree: _position-flipper(nth($pos, 2));
+      } @else if $length == 3 {
+        // eg. to top left
+        $corner: nth($pos, 3);
+      }
+    } @else if $length == 2 {
+      // Older syntax ("top left")
+      $side: _position-flipper(nth($pos, 1));
+      $corner: _position-flipper(nth($pos, 2));
+    }
+
+    @if ("#{$side} #{$corner}"=="left top") or
+      ("#{$side} #{$corner}"=="top left")
+    {
+      $degree: _position-flipper(#{$side}) _position-flipper(#{$corner});
+    } @else if
+      ("#{$side} #{$corner}"=="right top") or
+      ("#{$side} #{$corner}"=="top right")
+    {
+      $degree: _position-flipper(#{$side}) _position-flipper(#{$corner});
+    } @else if
+      ("#{$side} #{$corner}"=="right bottom") or
+      ("#{$side} #{$corner}"=="bottom right")
+    {
+      $degree: _position-flipper(#{$side}) _position-flipper(#{$corner});
+    } @else if
+      ("#{$side} #{$corner}"=="left bottom") or
+      ("#{$side} #{$corner}"=="bottom left")
+    {
+      $degree: _position-flipper(#{$side}) _position-flipper(#{$corner});
+    }
+    $spec: to $side $corner;
+  } @else if $length == 1 {
+    // Swap for backwards compatability
+    @if $type == string {
+      $degree: $pos;
+      $spec: to _position-flipper($pos);
+    } @else {
+      $degree: -270 - $pos; //rotate the gradient opposite from spec
+      $spec: $pos;
+    }
+  }
+  $degree: unquote($degree + ",");
+  $spec: unquote($spec + ",");
+  @return $degree $spec;
+}
+
+@function _position-flipper($pos) {
+  @return if($pos == left, right, null) if($pos == right, left, null)
+    if($pos == top, bottom, null) if($pos == bottom, top, null);
+}
+
+// --------------------------------------------------------
+// Progress Bar / Bar Graph % state class generator
+// --------------------------------------------------------
+// Generates 100 classes for percentage an attribute value (between 0-100) and a selector to apply it to
+// e.g @include progressStates('data-value','&:after');
+//
+@mixin progressValues(
+  $attribute: "data-value",
+  $appliedTo: "&:after",
+  $widthOrHeight: "width"
+) {
+  @for $i from 1 through 100 {
+    $iVal: "#{$i}%";
+    &[#{$attribute}="#{$i}"] {
+      #{$appliedTo} {
+        #{$widthOrHeight}: #{$iVal};
+      }
+    }
+  }
+}
+
+// --------------------------------------------------------
+// Progress Bar % state class generator
+// --------------------------------------------------------
+// Generates 100 classes for percentage an attribute value (between 0-100) and a selector to apply it to
+// e.g @include progressStates('data-value','&:after');
+//
+
+@mixin iterateNthChild($count: 10, $content: true) {
+  @for $i from 0 through $count {
+    @if $content == true {
+      &:nth-child(#{$i}) {
+        @content;
+      }
+    } @else {
+      &:nth-child(#{$i}) {
+        z-index: #{$count - $i};
+      }
+    }
+  }
+}
+
+// --------------------------------------------------------
+// Unit Conversion (px <=> rem)
+// --------------------------------------------------------
+// u is a Function that replaces default units in css.
+// It can be used to make designing with relative numbers easier
+// as it's possible to use px as a base which is then converted
+// into rem on compilation of the CSS.
+// Basic Usage:
+// px to rem    u(24px);
+// rem to px    u(2rem);
+// multiple values  u(24px 32px 10px 14px);
+
+// config
+$px-only: false !global;
+$pixelBase: 14 !global; /* 1 */
+
+@function parseInt($n) {
+  @return $n / ($n * 0 + 1); /* 2 */
+}
+
+@function u($values) {
+  /* 3 */
+
+  $list: (); /* 4 */
+
+  @each $value in $values {
+    /* 5 */
+
+    $unit: unit($value); /* 6 */
+    $val: parseInt($value); /* 2 */
+
+    @if ($px-only) and ($unit == "rem") {
+      /* 7 */
+      $list: append($list, ($val * $pixelBase) + px); /* 7 */
+    } @else if($unit == "px") or ($unit == "rem") {
+      /* 8 */
+      $list: append($list, $value); /* 8 */
+    } @else {
+      @warn 'There is no unit conversion for #{$unit}'; /* 9 */
+    }
+  }
+
+  @return $list(); /* 10 */
+}
+
+@mixin gradient-vertical(
+  $start-color: #555,
+  $end-color: #333,
+  $start-percent: 0%,
+  $end-percent: 100%
+) {
+  background-image: -webkit-linear-gradient(
+    top,
+    $start-color $start-percent,
+    $end-color $end-percent
+  ); // Safari 5.1-6, Chrome 10+
+  background-image: -o-linear-gradient(
+    top,
+    $start-color $start-percent,
+    $end-color $end-percent
+  ); // Opera 12
+  background-image: linear-gradient(
+    to bottom,
+    $start-color $start-percent,
+    $end-color $end-percent
+  ); // Standard, IE10, Firefox 16+, Opera 12.10+, Safari 7+, Chrome 26+
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{ie-hex-str($start-color)}', endColorstr='#{ie-hex-str($end-color)}', GradientType=0); // IE9 and down
+}
+
+@mixin top-pad($count) {
+  padding-top: paddit($count);
+}
+
+@function paddit($count) {
+  $padUnit: 42px;
+  @return $padUnit * $count;
+}
+
+@mixin container-buster($left: null, $right: null) {
+  box-sizing: content-box;
+
+  @if $left {
+    margin-left: -$left;
+    padding-left: $left;
+  }
+
+  @if $right {
+    margin-right: -$right;
+    padding-right: $right;
+  }
+}
+
+/*  this exciting function allows an selector to take a color value based on the slide's current colorway  */
+@mixin insert-colorway-tag(
+  $selector,
+  $property,
+  $colorway-offset,
+  $opacity: 1
+) {
+  @each $key, $valueMap in $colourways {
+    .u-colorway--#{$key} & #{$selector} {
+      $colour: map-get($valueMap, $colorway-offset);
+      @if $opacity < 1 {
+        #{$property}: rgba($colour, $opacity);
+      } @else {
+        #{$property}: $colour;
+      }
+    }
+  }
+}
+
+@mixin insert-slide-colorway-tag(
+  $selector,
+  $property,
+  $colorway-offset,
+  $opacity: 1
+) {
+  @each $key, $valueMap in $colourways {
+    &.u-colorway--#{$key} #{$selector} {
+      $colour: map-get($valueMap, $colorway-offset);
+      @if $opacity < 1 {
+        #{$property}: rgba($colour, $opacity);
+      } @else {
+        #{$property}: $colour;
+      }
+    }
+  }
+}
+
+/** on */
+@mixin only-for-modes($modes...) {
+  @for $i from 0 to length($modes) {
+    $mode: nth($modes, $i + 1);
+    .#{$mode} & {
+      @content;
+    }
+  }
+}

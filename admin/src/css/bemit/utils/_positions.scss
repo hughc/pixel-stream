@@ -1,0 +1,60 @@
+.u-rel {
+  position: relative;
+
+  @for $i from 1 through 80 {
+    $num: $i * 5;
+    @each $direction in $directions {
+      &--#{$direction}-#{$num} {
+        #{$direction}: $num * 1px;
+      }
+
+      &--#{$direction}-neg-#{$num} {
+        #{$direction}: $num * -1px;
+      }
+    }
+  }
+  /* zindex adjustment, useful where you want a column tucked under another */
+  @for $z_index from 1 through 5 {
+    &__z-#{$z_index} {
+      z-index: #{$z_index};
+    }
+    &__z-neg-#{$z_index} {
+      z-index: -#{$z_index};
+    }
+  }
+}
+
+.u-abs {
+  position: absolute;
+
+  @each $direction in $directions {
+    &--#{$direction} {
+      @extend .u-abs;
+      #{$direction}: 0;
+    }
+  }
+
+  @for $i from 1 through 80 {
+    $num: $i * 5;
+    @each $direction in $directions {
+      &--#{$direction}-#{$num} {
+        @extend .u-abs;
+        #{$direction}: $num * 1px;
+      }
+
+      &--#{$direction}-neg-#{$num} {
+        @extend .u-abs;
+        #{$direction}: $num * -1px;
+      }
+    }
+  }
+
+  /* shortand for aelement pinned to all 4 sides of parent */
+  &--trbl {
+    @extend .u-abs;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+}

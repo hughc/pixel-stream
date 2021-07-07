@@ -1,0 +1,10 @@
+.u-expand {
+  &--left {
+    width: calc(100% - $pagepad);
+    margin-left: -$pagepad;
+  }
+  &--right {
+    width: calc(100% - $pagepad);
+    margin-right: -$pagepad;
+  }
+}
