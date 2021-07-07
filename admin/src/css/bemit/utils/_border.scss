@@ -1,0 +1,40 @@
+.u-border {
+  position: relative;
+
+  &--none {
+    border: none;
+  }
+
+  @for $i from 1 through 10 {
+    $num: $i;
+    &-#{$num} {
+      border: $num * 1px solid;
+    }
+    @each $direction in $directions {
+      &--#{$direction}-#{$num} {
+        border-#{$direction}: $num * 1px solid;
+      }
+    }
+  }
+
+  @each $key, $value in $colour-list {
+    &--color-#{$key} {
+      border-color: $value;
+    }
+  }
+  &--radius {
+    @for $i from 1 through 30 {
+      /* 2px incremenets */
+      @if $i%2 {
+        &--#{$i} {
+          border-radius: $i * 1px;
+          @each $corner in $corners {
+            &--#{$corner}-#{$i} {
+              border-#{$corner}-radius: $i * 1px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

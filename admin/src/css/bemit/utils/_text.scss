@@ -1,0 +1,22 @@
+.u-text {
+  &-align {
+    &--center {
+      text-align: center;
+    }
+    &--right {
+      text-align: right;
+    }
+
+    &--tight {
+      line-height: 1em;
+    }
+  }
+  &-decoration {
+    &--underline {
+      text-decoration: underline;
+    }
+    &--strikethrough {
+      text-decoration: line-through;
+    }
+  }
+}

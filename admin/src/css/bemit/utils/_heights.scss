@@ -1,0 +1,19 @@
+.u-h--1 {
+  height: 100%;
+}
+
+@for $i from 2 through 15 {
+  @for $j from 1 through $i - 1 {
+    .u-h--#{$j}\/#{$i} {
+      height: 100% / $i * $j;
+    }
+  }
+}
+
+@for $i from 5 through 400 {
+  @if $i % 5 == 0 { 
+    .u-h--exactly-#{$i} {
+      height: #{$i}px;
+    }
+  }
+}

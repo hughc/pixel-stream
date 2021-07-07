@@ -1,0 +1,14 @@
+.u-s {
+  &--full-left {
+    width: 1257px;
+    max-width: 1257px;
+    height: 1080px;
+    max-height: 1080px;
+  }
+  &--full-right {
+    width: 1920 - 1257px;
+    max-width: 1920 - 1257px;
+    height: 1080px;
+    max-height: 1080px;
+  }
+}

@@ -1,0 +1,11 @@
+.u-blend {
+  &--multiply {
+    background-blend-mode: multiply;
+  }
+  &--luminosity {
+    background-blend-mode: luminosity;
+  }
+  &--lighten {
+    background-blend-mode: lighten;
+  }
+}

@@ -1,0 +1,40 @@
+.subslide {
+  flex: none;
+  width: $slide-width;
+  height: $slide-height;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  &.trans {
+    transition: transform 0.5s $easeInOutSine;
+  }
+  perspective: 1px;
+  will-change: transform;
+  // opacity: 0;
+}
+
+@for $i from 1 through 30 {
+  #subslide-#{$i + 1} {
+    transform: translateY(100%) translateZ(0px);
+    // opacity: 0;
+  }
+  .subslide-#{$i} {
+    @for $j from 0 through ($i - 1) {
+      #subslide-#{$j} {
+        transform: translateY(-100%) translateZ(0px);
+        // opacity: 0;
+      }
+    }
+    #subslide-#{$i} {
+      transform: translateY(0%) translateZ(0px);
+      // opacity: 1;
+    }
+    @for $k from ($i + 1) through 30 {
+      #subslide-#{$k} {
+        transform: translateY(100%) translateZ(0px);
+        // opacity: 0;
+      }
+    }
+  }
+}

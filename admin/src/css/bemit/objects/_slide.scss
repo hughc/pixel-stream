@@ -1,0 +1,19 @@
+.presenter-content {
+  position: absolute;
+  top: 0;
+  & > article {
+    position: absolute;
+    top: 0;
+    cursor: default;
+    * {
+      box-sizing: border-box;
+    }
+  }
+}
+
+article {
+  height: $slide-height;
+  width: $slide-width;
+  display: flex;
+  flex-direction: column;
+}

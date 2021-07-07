@@ -1,0 +1,22 @@
+@import "~bootstrap/scss/bootstrap";
+@import "./bemit-framework";
+
+.full-height, html {
+  height: 100%;
+}
+
+.App {
+  .sidebar {
+    background-color:  theme-color('primary');
+    color:  color('white');
+  }
+}
+
+.a {
+  &-list {
+    &-image {
+      width: 32px;
+      height: auto;
+    }
+  }
+}

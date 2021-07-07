@@ -1,0 +1,9 @@
+.u-fill {
+  @each $key, $value in $colour-list {
+    &--#{$key} {
+      svg path {
+        fill: $value;
+      }
+    }
+  }
+}

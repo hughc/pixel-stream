@@ -1,0 +1,204 @@
+// Font family
+$font-main: "Aeonik";
+
+/// Map deep get
+/// @author https://css-tricks.com/snippets/sass/deep-getset-maps/
+/// @param {Map} $map - Map
+/// @param {Arglist} $keys - Key chain
+/// @return {*} - Desired value
+@function map-deep-get($map, $keys...) {
+  @each $key in $keys {
+    $map: map-get($map, $key);
+  }
+  @return $map;
+}
+
+@mixin font-main() {
+  font-family: $font-main;
+  letter-spacing: 0;
+}
+
+$font-size-list: (
+  54: 54px,
+  40: 40px,
+  32: 32px,
+  30: 30px,
+  26: 26px,
+  24: 24px,
+  20: 20px,
+  18: 18px,
+  16: 16px,
+  14: 14px,
+  // source references
+  12: 12px
+);
+
+$margin-list: 20 30 60 90 120;
+$padding-list: 10 15 20 30 40 50;
+
+$leading: 6px;
+
+@function get-font-size($size) {
+  @if map-has-key($font-size-list, $size) {
+    $font-details: map-get($font-size-list, $size);
+
+    $font-size: if(
+      type_of($font-details) == map,
+      map-get($font-details, font-size),
+      $font-details
+    );
+
+    @return $font-size;
+  } @else {
+    @error "font-size #{$size} does not exist in font-size object";
+  }
+}
+
+@function get-line-height($size) {
+  @if map-has-key($font-size-list, $size) {
+    $font-details: map-get($font-size-list, $size);
+
+    $line-height: if(
+      type_of($font-details) == map,
+      map-get($font-details, line-height),
+      $font-details + $leading
+    );
+
+    @return $line-height;
+  } @else {
+    @error "font-size #{$size} does not exist in font-size object";
+  }
+}
+
+@mixin font-size($size: 20, $leading: false) {
+  $font-size: get-font-size($size);
+  font-size: $font-size;
+  @if $leading {
+    line-height: $font-size + $leading;
+  } @else {
+  line-height: get-line-height($size);
+}
+}
+
+// Font weight
+// https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
+$font-weight-list: (
+  thin: 200,
+  light: 300,
+  normal: 400,
+  medium: 500,
+  demi: 600,
+  bold: 700
+);
+
+@function get-font-weight($weight) {
+  @if map-has-key($font-weight-list, $weight) {
+    $font-weight: map-get($font-weight-list, $weight);
+    @return $font-weight;
+  } @else {
+    @error "font-weight #{$weight} has not been included in this deck";
+  }
+}
+
+@mixin font-weight($weight: normal) {
+  font-weight: get-font-weight($weight);
+}
+
+// Colours
+
+$colour-list: (
+  cobalt: #2206C2,
+  light-blue: #6D57FF,
+  purple: #7A06EE,
+  violet: #C702E6,
+  orange: #FF3111,
+  lime: #CBFE3A,
+  cyan: #0EFBED,
+  light-blue-grey: #F0F0F5,
+  black: #000000,
+  grey-900: #1A1A1A,
+  grey-850: #191919,
+  grey-800: #333333,
+  grey-700: #4D4D4D,
+  grey-600: #666666,
+  grey-500: #808080,
+  grey-400: #999999,
+  grey-300: #B2B2B2,
+  grey-200: #CCCCCC,
+  grey-100: #E5E5E5,
+  grey-040: #F5F5F5,
+  white: #FFFFFF
+);
+
+@function colour($colour-name) {
+  @if map-has-key($colour-list, $colour-name) {
+    @return map-get($colour-list, $colour-name);
+  } @else {
+    @error "colour #{$colour-name} does not exist in colour object";
+  }
+}
+
+// Z-indexes
+
+$slideZ: 1;
+$slide-constantZ: 100;
+
+//----------------------------------------------------------------------------//
+// Measurements --------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+// Alter these as necessary
+
+$pagepad: 120px; // left and right padding
+$pagepad-top: 30px; // top padding - space between bottom of header and top of content
+$pagepad-bottom: 60px; // bottom padding - space between bottom of content and footer
+$footer-height: 70px;
+$header-height: 160px;
+
+$dimensions: (
+  width: 1920px,
+  height: 1080px
+);
+
+$slide-width: 1920px;
+$slide-height: 1080px;
+
+$content-width: $slide-width - ($pagepad * 2);
+$content-height: $slide-height -
+  ($pagepad-top + $header-height + $footer-height + $pagepad-bottom);
+
+$header-width: $content-width;
+$footer-width: $slide-width;
+
+// Useful variables
+//------------------------------//
+
+$directions: (top, right, bottom, left);
+$corners: (top-right, bottom-right, top-left, bottom-left);
+$text-primary: colour(black);
+$text-inverse: colour(white);
+
+// Borders
+//------------------------------//
+
+$border-radius: 6px;
+$border-radius-lrg: 12px;
+$border-primary: 2px solid colour(black);
+$border-highlight: 2px solid colour(black);
+
+// debug
+$debug: false;
+
+// Preso Modes
+
+$preso-modes: (
+  prep: "preview",
+  present: "present",
+  review: "review",
+  edit: "edit-mode",
+  online: "share_online",
+  screenshot: "screenshot",
+  screenshot-thumbnail: "screenshot-thumbnail",
+  screenshot-full: "screenshot-full",
+  client: "client",
+  master: "master"
+);

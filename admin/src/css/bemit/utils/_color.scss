@@ -1,0 +1,10 @@
+.u-color {
+  @each $key, $value in $colour-list {
+    &--#{$key} {
+      color: $value;
+    }
+    &-bg--#{$key} {
+      background-color: $value;
+    }
+  }
+}

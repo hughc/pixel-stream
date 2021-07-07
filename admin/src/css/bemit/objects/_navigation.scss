@@ -1,0 +1,52 @@
+.o-navigation {
+  position: absolute;
+  bottom: 40px;
+  right: $pagepad;
+  width: 100%;
+  z-index: 10;
+  &--next,
+  &--right,
+  &--left,
+  &--prev {
+    height: 50px;
+    width: 50px;
+    @include cursor();
+    transition: opacity 0.2s ease-out;
+    background-color: colour(lime);
+    background-image: url("./img/navigation/navigation-down.svg");
+    background-position: center center;
+    background-size: 18px 10px;
+    background-repeat: no-repeat;
+  }
+
+  &__button {
+    display: flex;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+  }
+
+  &__label {
+    height: 50px;
+    padding: 0px 16px;
+    @include font-size(20);
+    @include font-weight(bold);
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    background-color: colour(lime);
+  }
+  &--disabled {
+    pointer-events: none;
+    opacity: 0;
+  }
+  &--prev {
+    transform: rotate(180deg);
+  }
+  &--right {
+    transform: rotate(270deg);
+  }
+  &--left {
+    transform: rotate(90deg);
+  }
+}

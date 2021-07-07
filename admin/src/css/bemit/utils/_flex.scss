@@ -1,0 +1,78 @@
+.u-flex {
+  display: flex;
+  &--1 {
+    flex: 1 !important;
+  }
+  &--0 {
+    flex: 0 !important;
+  }
+  @for $i from 2 through 10 {
+    &--#{$i} {
+      flex: $i;
+    }
+  }
+  &--col {
+    flex-direction: column;
+  }
+  &--col-reverse {
+    flex-direction: column-reverse;
+  }
+  &--row {
+    flex-direction: row;
+  }
+  &--row-reverse {
+    flex-direction: row-reverse;
+  }
+  &--justify-center {
+    justify-content: center;
+  }
+  &--justify-start {
+    justify-content: flex-start;
+  }
+  &--justify-end {
+    justify-content: flex-end;
+  }
+  &--justify-between {
+    justify-content: space-between;
+  }
+  &--justify-around {
+    justify-content: space-around;
+  }
+  &--align-center {
+    align-items: center;
+  }
+  &--align-start {
+    align-items: flex-start;
+  }
+  &--align-end {
+    align-items: flex-end;
+  }
+  &--to-right {
+    margin-left: auto;
+  }
+  &--to-bottom {
+    margin-top: auto;
+  }
+  &--wrap {
+    flex-wrap: wrap;
+  }
+  &--wrap-reverse {
+    flex-wrap: wrap-reverse;
+  }
+
+  @for $i from 2 through 30 {
+    @for $j from 1 through $i - 1 {
+      &--#{$j}\/#{$i} {
+        flex: 0 0 (100% / $i * $j);
+      }
+    }
+  }
+  @for $i from 5 through 500 {
+      @if $i%5 ==0 {
+        
+        &--exactly-#{$i} {
+          flex: 0 0 #{$i}px;
+        }
+      }
+  }
+}

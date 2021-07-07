@@ -1,0 +1,7 @@
+.o-draggable-container {
+  position: absolute;
+  cursor: grabbing !important;
+  > * {
+    //   pointer-events: none;
+  }
+}

@@ -1,0 +1,9 @@
+.u-rounded {
+  border-radius: 50%;
+  @for $i from 1 through 20 {
+    $num: $i * 1;
+    &-#{$num} {
+      border-radius: $num * 1px;
+    }
+  }
+}

@@ -1,0 +1,29 @@
+.u-font {
+  @each $font-size, $value in $font-size-list {
+    &--fz-#{$font-size} {
+      font-size: get-font-size($font-size);
+      line-height: get-line-height($font-size);
+    }
+    &--fz-#{$font-size}-tight {
+      font-size: get-font-size($font-size);
+      line-height: get-font-size($font-size) + 2px;
+    }
+  }
+
+  @each $font-weight, $value in $font-weight-list {
+    &--#{$font-weight} {
+      @include font-weight($font-weight);
+    }
+  }
+
+  &--italic {
+    font-style: italic;
+  }
+
+  &--0-ltr-spacing {
+    letter-spacing: 0em;
+    &--children > * {
+      letter-spacing: 0em;
+    }
+  }
+}

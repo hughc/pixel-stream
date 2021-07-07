@@ -1,0 +1,16 @@
+.u-pad {
+  @each $direction in $directions {
+    @each $i in $padding-list {
+      &--#{$i} {
+        padding: $i * 1px;
+      }
+
+      &--#{$direction}-#{$i} {
+        padding-#{$direction}: $i * 1px;
+      }
+    }
+  }
+  &--none {
+    padding: 0;
+  }
+}

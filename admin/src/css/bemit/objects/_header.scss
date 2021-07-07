@@ -1,0 +1,30 @@
+.o-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  padding: 78px $pagepad 0;
+  margin-bottom: $pagepad-top;
+  @extend .o-transition--fade-right;
+  &__title {
+    & > div {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  &--centered {
+    align-items: center;
+  }
+
+  &--fade {
+    background: linear-gradient(colour(white) 60%, rgba(colour(white), 0) 100%);
+  }
+
+  &--constant {
+    @extend .o-slide-constant;
+    position: absolute;
+    top: 0;
+  }
+}

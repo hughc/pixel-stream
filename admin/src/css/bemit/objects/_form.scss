@@ -1,0 +1,217 @@
+.o-form {
+  // something
+  & > * {
+    &:last-child {
+      margin-bottom: 0px;
+    }
+  }
+}
+
+.o-input {
+  display: block;
+  background-color: colour(white);
+  border: 1px solid colour(form-border);
+  font-size: font-size(30);
+  padding: 21px 20px;
+  font-weight: 100;
+  width: 100%;
+  position: relative;
+  .client & {
+    pointer-events: none;
+  }
+  &:active,
+  &:focus {
+    border: 1px solid colour(form-focus);
+    outline: none;
+  }
+  &--datepicker {
+    margin-bottom: 10px;
+  }
+  &--container {
+    position: relative;
+    padding-bottom: 25px;
+    .l-grid {
+      align-items: flex-end;
+    }
+  }
+  &--error {
+    border-color: colour(form-error);
+  }
+  &--error-message {
+    margin-left: auto;
+    color: colour(form-error);
+    padding-bottom: 24px;
+  }
+  &--small {
+    font-size: font-size(20);
+    padding: 9px 10px;
+  }
+  &--value-metres {
+    &:after {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      content: "m";
+      font-size: font-size(30);
+      font-family: "HelveticaNeue";
+      font-weight: 100;
+    }
+  }
+}
+
+.o-radio {
+  .client & {
+    pointer-events: none;
+    * {
+      pointer-events: none;
+    }
+  }
+  &--item {
+    .client & {
+      pointer-events: none;
+      * {
+        pointer-events: none;
+      }
+    }
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    div {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: colour(white);
+      border: 1px solid colour(form-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    p {
+      margin-top: 10px;
+      font-size: font-size(20);
+    }
+    &[selected="selected"] {
+      div {
+        &:after {
+          content: "";
+          display: block;
+          width: 15px;
+          height: 10px;
+          background-image: url("img/backgrounds/dark_tick.svg");
+          background-size: contain;
+          background-repeat: no-repeat;
+          background-position: center center;
+        }
+      }
+    }
+  }
+}
+
+.o-label {
+  font-size: font-size(40);
+  font-weight: 100;
+  padding-bottom: 18px;
+  display: block;
+}
+
+.flatpickr-wrapper {
+  &:after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    right: 12px;
+    top: 0px;
+    pointer-events: none;
+    background-image: url("img/calendar.svg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+  }
+}
+
+.o-textarea {
+  @extend .o-input;
+  resize: none;
+}
+
+.o-select {
+  position: relative;
+  background-color: colour(white);
+  border: 1px solid colour(form-border);
+  padding: 4px;
+  height: 42px;
+  width: 100%;
+  .client & {
+    pointer-events: none;
+    * {
+      pointer-events: none;
+    }
+  }
+  &--toggle {
+    
+    position: absolute;
+    top: 0;
+    width: 100%;
+    bottom: 0;
+
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    &:after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      display: block;
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
+      background-color: colour(form-border);
+      background-image: url("img/buttons/down-arrow.svg");
+      background-position: center center;
+      background-size: 19px 10px;
+      background-repeat: no-repeat;
+    }
+  }
+  &--display {
+    width: 100%;
+    font-size: font-size(20);
+    line-height: 32px;
+    padding-left: 10px;
+  }
+  &--options {
+    border: 1px solid colour(form-border);
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    left: -1px;
+    right: -1px;
+    background-color: colour(white);
+    transition: opacity 0.2s ease-out;
+  }
+  &--option {
+    padding: 10px;
+    cursor: pointer;
+    &:hover {
+      background-color: colour(form-highlight);
+    }
+  }
+  &[open="open"] {
+    z-index: 10;
+    .o-select--options {
+      pointer-events: initial;
+      opacity: 1;
+    }
+  }
+}

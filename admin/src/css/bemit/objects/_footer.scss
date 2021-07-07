@@ -1,0 +1,26 @@
+.o-footer {
+  position: relative;
+  width: 100%;
+  height: $footer-height;
+  padding: 0 $pagepad;
+  // background-color: colour(charcoal-l-04);
+  margin-top: $pagepad-bottom;
+
+  &--constant {
+    @extend .o-slide-constant;
+    position: absolute;
+    bottom: 0;
+  }
+
+  &--fade {
+    background: linear-gradient(rgba(colour(white), 0) 90%, colour(white) 40%);
+  }
+
+  &--large {
+    height: round($footer-height * 1.67);
+  }
+
+  &--no-margin {
+    margin-top: 0;
+  }
+}

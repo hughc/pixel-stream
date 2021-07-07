@@ -1,0 +1,16 @@
+.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+
+  @each $mode, $class in $preso-modes {
+    &--#{$mode} {
+      .#{$class} & {
+        @extend .is-hidden;
+      }
+    }
+  }
+}
+
+.is-none {
+  display: none;
+}
