@@ -1,3 +1,32 @@
+
+#include <bitswap.h>
+#include <chipsets.h>
+#include <color.h>
+#include <colorpalettes.h>
+#include <colorutils.h>
+#include <controller.h>
+#include <cpp_compat.h>
+#include <dmx.h>
+#include <fastled_config.h>
+#include <fastled_delay.h>
+#include <fastled_progmem.h>
+#include <FastLED.h>
+#include <fastpin.h>
+#include <fastspi_bitbang.h>
+#include <fastspi_dma.h>
+#include <fastspi_nop.h>
+#include <fastspi_ref.h>
+#include <fastspi_types.h>
+#include <fastspi.h>
+#include <hsv2rgb.h>
+#include <led_sysdefs.h>
+#include <lib8tion.h>
+#include <noise.h>
+#include <pixelset.h>
+#include <pixeltypes.h>
+#include <platforms.h>
+#include <power_mgt.h>
+
 /*
   ESP8266 mDNS responder sample
 
@@ -50,12 +79,12 @@ FASTLED_USING_NAMESPACE
 //#define CLK_PIN   4
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
-#define SQUARE_SIZE "32"
-#define NUM_LEDS 1024
+#define SQUARE_SIZE "8"
+#define NUM_LEDS 256
 
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS 100
+#define BRIGHTNESS 25
 
 #define FRAMES_PER_SECOND 60
 
@@ -66,7 +95,6 @@ const char *ssid = STASSID;
 const char *password = STAPSK;
 
 HTTPClient http;
-
 uint8_t RGBValues[NUM_LEDS * 3]; // string array to store the result
 
 void getImage()
@@ -178,7 +206,9 @@ void setup(void)
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED)
   {
-    delay(500);
+    delay(250);
+  fill_solid(leds, NUM_LEDS, CRGB::Yellow);
+  FastLED.show();
 
 		fill_solid(leds, NUM_LEDS, CRGB::Yellow);
 		//  fill_solid(blocks, , CRGB::Black);
@@ -189,7 +219,7 @@ void setup(void)
   // allow reuse (if server supports it)
   http.setReuse(true);
 
-	fill_solid(leds, NUM_LEDS, CRGB::Green);
+	fill_solid(leds, NUM_LEDS, CRGB::Red);
 	//  fill_solid(blocks, , CRGB::Black);
 	FastLED.show();
 
@@ -199,7 +229,7 @@ void setup(void)
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  getImage();
+//  getImage();
 }
 
 void loop(void)

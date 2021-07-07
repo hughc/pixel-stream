@@ -3,6 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
+                "C:\\Users\\Hugh\\Documents\\Arduino\\libraries\\LEDText",
+                "C:\\Users\\Hugh\\Documents\\Arduino\\libraries\\FastLED-3.3.3",
                 "C:\\Users\\Hugh\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\**",
                 "C:\\Program Files (x86)\\Arduino\\tools\\**",
                 "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**",

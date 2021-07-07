@@ -1,0 +1,52 @@
+{
+  "configurations": [
+    {
+      "name": "Visual Micro",
+      "intelliSenseMode": "windows-msvc-x86",
+      "includePath": [
+        "${projectRoot}..\\esp8266-fastled-iot-webserver",
+        "${projectRoot}..\\..\\Documents\\Arduino\\libraries\\FastLED-3.3.3",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\libraries\\ESP8266WiFi\\src",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\libraries\\ESP8266WebServer\\src",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\libraries\\EEPROM",
+        "${projectRoot}..\\..\\Documents\\Arduino\\libraries\\PubSubClient\\src",
+        "${projectRoot}..\\..\\Documents\\Arduino\\libraries\\ArduinoJson\\src",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\libraries\\ArduinoOTA",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\libraries\\ESP8266mDNS\\src",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\cores\\esp8266",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\cores\\esp8266\\avr",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\cores\\esp8266\\libb64",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\cores\\esp8266\\spiffs",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\cores\\esp8266\\umm_malloc",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\variants\\d1_mini",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\tools\\sdk\\include",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\tools\\sdk\\lwip2\\include",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\tools\\sdk\\libc\\xtensa-lx106-elf\\include",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\2.5.0-4-b40a506\\xtensa-lx106-elf\\include\\c++\\4.8.2",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\2.5.0-4-b40a506\\xtensa-lx106-elf\\include\\c++\\4.8.2\\xtensa-lx106-elf",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\2.5.0-4-b40a506\\xtensa-lx106-elf\\include",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\2.5.0-4-b40a506\\lib\\gcc\\xtensa-lx106-elf\\4.8.2\\include",
+        "${projectRoot}..\\..\\AppData\\Local\\arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\tools\\sdk\\include"
+      ],
+      "defines": [
+        "__ESP8266_esp8266__",
+        "__ESP8266_ESP8266__",
+        "__ets__",
+        "ICACHE_FLASH",
+        "NONOSDK22x_190703=1",
+        "F_CPU=80000000L",
+        "LWIP_OPEN_SRC",
+        "TCP_MSS=536",
+        "LWIP_FEATURES=1",
+        "LWIP_IPV6=0",
+        "ARDUINO=10809",
+        "ARDUINO_ESP8266_WEMOS_D1MINI",
+        "ARDUINO_ARCH_ESP8266",
+        "FLASHMODE_DIO",
+        "ESP8266",
+        "__cplusplus=201103L",
+        "_VMICRO_INTELLISENSE"
+      ]
+    }
+  ]
+}
