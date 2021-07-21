@@ -48,8 +48,9 @@ function gatherAllImages(path) {
         if (stat.isDirectory()) {
           list = recursiveList(conCatPath, list);
         } else if(fileOrFolder.match(/\.gif|\.jpg|\.png/g)) {
-          list.push(conCatPath.substr(path.length +1));
-        }
+					const foundImage = conCatPath.substr(path.length + 1);
+					list.push(foundImage);
+			  }
       })
       return list;
   }
@@ -92,7 +93,7 @@ app.get("/images", (req, res) => {
   var output = []
   Promise.all(
     images.map(img => {
-      sharp(`${imageDirectoryPath}/${img}`)
+      return sharp(`${imageDirectoryPath}/${img}`)
       .metadata().catch(err => console.warn(`${img}: ${err}`))
       .then(function (metadata) {
         const path = `${staticImageBaseURL}/${img}`;
@@ -102,6 +103,7 @@ app.get("/images", (req, res) => {
     }
     )
   ).then(results => {
+		console.log(results, output);
     res.send(output);
   }
   )

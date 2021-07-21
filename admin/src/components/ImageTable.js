@@ -1,6 +1,9 @@
 
 import { Component } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
+import _ from 'underscore';
+import { DragDropContext, Droppable, Draggable} from "react-beautiful-dnd";
+
 
 
 const API_BASE_URL = 'http://localhost:3001';
@@ -41,27 +44,39 @@ export class ImageTable extends Component {
   }
 
   render() {
-    const columns = [{
-      dataField: 'path',
-      text: 'preview',
-      formatter: (cell, row, rowIndex, formatExtraData) => {
-        return <div>
-          <img class='a-list-image' src={`${API_BASE_URL}${cell}`} />
-          <div class='a-list-title'>{row.img.replace(/.png|.gif|.jpg/g, '')}</div>
-        </div>;
-      }
-    }, {
-      dataField: 'img',
-      text: 'Image'
-    }];
     
-    return (
-      <div>
-      <BootstrapTable data={this.state.images} keyField='img' columns = {columns}/>
-        <p>{this.state.isFetching ? 'Fetching images...' : ''}</p>
-        <p>{!this.state.isFetching ? 'not fetching' : ''}</p>
-      </div>
-    )
+		const images = _.map(this.state.images, (image, index) => (
+      <Draggable key={image.path} draggableId={image.path} index={index}>
+        {(provided) => (
+          <li>
+						<img
+						            ref={provided.innerRef}
+						            {...provided.draggableProps}
+						            {...provided.dragHandleProps}
+						            class="a-list-image"
+						            alt={image.img.replace(/.png|.gif|.jpg/g, "")}
+						            src={`${API_BASE_URL}${image.path}`}
+						          />
+					</li>
+        )}
+      </Draggable>
+    ));
+	const rValue = (
+    <DragDropContext>
+      <Droppable droppableId="a-list">
+        {(provided) => (
+          <ul
+            class="a-list"
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+          >
+            {images}
+          </ul>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+	return rValue;
   }
 
 
