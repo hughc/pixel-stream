@@ -1,20 +1,61 @@
-import './css/App.scss';
-import { Container, Row, Col } from 'react-bootstrap';
+import "./css/App.scss";
+import { Container, Row, Col } from "react-bootstrap";
 
 //import ImageTable from './components/ImageTable';
-import {ImageSorter} from './components/ImageSorter';
+import { ImageSorter } from "./components/ImageSorter";
+import Header from "./components/Header";
+import { Component } from "react";
+import LinkList from "./components/LinkList";
+import { Welcome } from "./components/Welcome";
+import ClientConfig from "./components/ClientConfig";
+import APIClient from "./utils/APIClient";
 
-function App() {
-  return (
-    <div className="App full-height">
-      <Container fluid className='full-height'>
-        <Row className='full-height'>
-          <Col xs={1} className='sidebar u-pad--20'>Links</Col>
-          <Col className='u-pad--20'><ImageSorter /></Col>
-        </Row>
-      </Container>
-    </div>
-  );
+class App extends Component {
+  constructor() {
+    super();
+    this.state = { currentScreen: "welcome" };
+    this.linkClick = this.changeScreen.bind(this);
+    this.apiInterface = new APIClient();
+  }
+  render() {
+    let mainContent;
+    switch (this.state.currentScreen) {
+      case "imagesorter":
+        mainContent = <ImageSorter />;
+        break;
+      case "welcome":
+        mainContent = <Welcome />;
+        break;
+      case "clientconfig":
+        mainContent = <ClientConfig api={this.apiInterface} />;
+        break;
+
+      default:
+        break;
+    }
+    return (
+      <div className="App full-height">
+        <Header title="Pixel grid admin" />
+        <Container fluid className="u-h--1">
+          <Row className="u-h--1">
+            <Col xs={1} className="sidebar u-pad--20">
+              <LinkList
+                onClick={this.linkClick}
+                activeScreen={this.state.currentScreen}
+              />
+            </Col>
+            <Col className="u-pad--20">{mainContent}</Col>
+          </Row>
+        </Container>
+      </div>
+    );
+  }
+
+  changeScreen(e) {
+    console.log(e);
+    e.preventDefault();
+    this.setState({ currentScreen: e.target.dataset.target });
+  }
 }
 
 export default App;

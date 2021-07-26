@@ -1,31 +1,48 @@
 @import "~bootstrap/scss/bootstrap";
 @import "./bemit-framework";
 
-.full-height, html {
+.full-height,
+html {
   height: 100%;
 }
 
 .App {
   .sidebar {
-    background-color:  theme-color('primary');
-    color:  color('white');
+    background-color: theme-color("primary");
+    color: color("white");
   }
 }
 
 .a {
   &-list {
-		background: #efefef;
-		padding: 10px;
-		border-radius: 10px;
+    background: #efefef;
+    padding: 10px;
+    border-radius: 10px;
     &-image {
       width: 32px;
-			height: auto;
-			margin: 10px;
+      height: auto;
+      margin: 10px;
     }
   }
 }
 
 .drop-zone {
-	background-color: red;
-	height: 100%;
+  background-color: red;
+  height: 100%;
+}
+.c {
+  &-link-list {
+    list-style: none;
+    padding: 0;
+    li {
+      a {
+        display: block;
+        color: white;
+        padding: 5px;
+        &.is-active {
+          border: 1px dotted white;
+        }
+      }
+    }
+  }
 }
