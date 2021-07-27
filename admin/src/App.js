@@ -8,14 +8,13 @@ import { Component } from "react";
 import LinkList from "./components/LinkList";
 import { Welcome } from "./components/Welcome";
 import ClientConfig from "./components/ClientConfig";
-import APIClient from "./utils/APIClient";
+import { RecoilRoot } from "recoil";
 
 class App extends Component {
   constructor() {
     super();
     this.state = { currentScreen: "welcome" };
     this.linkClick = this.changeScreen.bind(this);
-    this.apiInterface = new APIClient();
   }
   render() {
     let mainContent;
@@ -27,27 +26,29 @@ class App extends Component {
         mainContent = <Welcome />;
         break;
       case "clientconfig":
-        mainContent = <ClientConfig api={this.apiInterface} />;
+        mainContent = <ClientConfig />;
         break;
 
       default:
         break;
     }
     return (
-      <div className="App full-height">
-        <Header title="Pixel grid admin" />
-        <Container fluid className="u-h--1">
-          <Row className="u-h--1">
-            <Col xs={1} className="sidebar u-pad--20">
-              <LinkList
-                onClick={this.linkClick}
-                activeScreen={this.state.currentScreen}
-              />
-            </Col>
-            <Col className="u-pad--20">{mainContent}</Col>
-          </Row>
-        </Container>
-      </div>
+      <RecoilRoot>
+        <div className="App full-height">
+          <Header title="Pixel grid admin" />
+          <Container fluid className="u-h--1">
+            <Row className="u-h--1">
+              <Col xs={1} className="sidebar u-pad--20">
+                <LinkList
+                  onClick={this.linkClick}
+                  activeScreen={this.state.currentScreen}
+                />
+              </Col>
+              <Col className="u-pad--20">{mainContent}</Col>
+            </Row>
+          </Container>
+        </div>
+      </RecoilRoot>
     );
   }
 

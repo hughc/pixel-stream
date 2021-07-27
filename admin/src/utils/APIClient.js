@@ -1,17 +1,20 @@
 import { Component } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import _ from "underscore";
+import { clientFetching } from "../recoil/clients";
 const API_BASE_URL = "http://localhost:3001";
 const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
 const CLIENT_LIST_URL = `${API_BASE_URL}/clients`;
 
-export default class APIClient extends Component {
+export function ApiClientWrapper() {
+  const clientFetchingSetter = useSetRecoilState(clientFetching);
+
+  return <APIClient clientFetching={clientFetchingSetter} />;
+}
+
+export class APIClient extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isFetching: false,
-      images: [],
-      clients: [],
-    };
   }
 
   render() {
@@ -33,17 +36,19 @@ export default class APIClient extends Component {
   };
 
   fetchClients = () => {
-    this.setState({ isFetching: true });
+    //this.setState({ isFetching: true });
+    this.clientFetching((oldValue) => true);
     fetch(CLIENT_LIST_URL)
       .then((response) => {
         return response.json();
       })
       .then((result) => {
-        this.setState({ clients: result, isFetching: false });
+        this.clientFetching((oldValue) => true);
+        //      this.setState({ clients: result, isFetching: false });
       })
       .catch((e) => {
         console.log(e);
-        this.setState({ isFetching: false });
+        this.clientFetching((oldValue) => false);
       });
   };
 }
