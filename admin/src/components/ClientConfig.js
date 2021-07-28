@@ -10,7 +10,6 @@ export default class ClientConfig extends Component {
   }
 
   onClientSelect(e) {
-    console.log(e);
     e.preventDefault();
     this.setState({ userId: e.target.dataset.target });
   }
@@ -28,9 +27,11 @@ export default class ClientConfig extends Component {
                 ></ClientList>
               </Suspense>
             </Col>
-            <Col className="u-pad--20">
-              <ClientConfigForm clientId={this.state.userId} />
-            </Col>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Col className="u-pad--20">
+                <ClientConfigForm clientId={this.state.userId} />
+              </Col>
+            </Suspense>
           </Row>
         </Container>
       </div>

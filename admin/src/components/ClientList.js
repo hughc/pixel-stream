@@ -1,29 +1,30 @@
 import { useEffect, useState } from "react";
 import { selector, useRecoilValue, useSetRecoilState } from "recoil";
-import { clientId, clientSelector } from "../recoil/clients";
+import { clientId, clientsList } from "../recoil/clients";
 
 export function ClientList(props) {
-  const clientFetching = useRecoilValue(clientSelector);
+  const clientLists = useRecoilValue(clientsList);
   const clientIdSetter = useSetRecoilState(clientId);
 
   const selector = (e) => {
+    e.preventDefault();
     clientIdSetter((oldId) => e.target.dataset.target);
   };
 
   const renderItem = (item) => {
     return (
-      <div key={item.id}>
-        <a data-target={item.id} onClick={selector}>
-          {item.title}
+      <div key={item.id} className="c-clients__single">
+        <a href="" data-target={item.id} onClick={selector}>
+          {item.id}
         </a>
       </div>
     );
   };
 
   return (
-    <div>
-      <h3>Client List:</h3>
-      {clientFetching.map(renderItem)}
+    <div className="c-clients">
+      <h4>Client List:</h4>
+      {clientLists.map(renderItem)}
     </div>
   );
 }
