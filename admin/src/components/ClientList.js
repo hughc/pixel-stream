@@ -1,4 +1,4 @@
-import {useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { clientId, clientsList } from "../recoil/clients";
 
 export function ClientList(props) {

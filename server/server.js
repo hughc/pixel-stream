@@ -15,12 +15,15 @@ var path = require("path");
 var app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
+//var bodyParser = require("body-parser");
 
 app.use(staticImageBaseURL, express.static(imageDirectoryPath));
 // default options
 app.use(fileUpload());
 // Parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.urlencoded());
+app.use(express.json({ type: "application/json)" }));
+//app.use(bodyParser.json());
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
 
@@ -73,7 +76,8 @@ app.get("/checkin", (req, res) => {
 });
 
 app.post("/clients", function (req, res) {
-  var clientData = _.pluck(
+  console.log(req.body);
+  var clientData = _.pick(
     req.body,
     "id",
     "pixelsCount",
@@ -95,11 +99,12 @@ function saveClient(clientData, overWriteFlag) {
   existingClient = _.findWhere(clientsList, { id: clientData.id });
   if (existingClient && overWriteFlag) {
     const pos = clientsList.indexOf(existingClient);
-    clientsList.splice(pos, 1, existingClient);
+    clientsList.splice(pos, 1, clientData);
+    console.log({ clientsList });
   } else if (!existingClient) {
     clientsList.push(clientData);
   }
-  fs.writeJSONSync(clientsList, "./data/clients.json");
+  fs.writeJSONSync("./data/clients.json", clientsList);
 }
 
 app.get("/image", (req, res) => {

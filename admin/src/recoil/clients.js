@@ -1,9 +1,9 @@
 import { atom, selector } from "recoil";
 import _ from "underscore";
 
-const API_BASE_URL = "http://localhost:3001";
-const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
-const CLIENT_LIST_URL = `${API_BASE_URL}/clients`;
+export const API_BASE_URL = "http://localhost:3001";
+export const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
+export const CLIENT_API_URL = `${API_BASE_URL}/clients`;
 
 export const clientFetching = atom({
   key: "clientFetching",
@@ -25,11 +25,14 @@ export const clientObject = selector({
   },
 });
 
-const clientSelector = selector({
+export const clientSelector = selector({
   key: "clientSelector",
   get: async () => {
-    const apiData = await fetch(CLIENT_LIST_URL).then((res) => res.json());
+    const apiData = await fetch(CLIENT_API_URL).then((res) => res.json());
     return apiData;
+  },
+  set: ({ set }, data) => {
+    set(clientsList, data);
   },
 });
 

@@ -1,6 +1,5 @@
 import { Component } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import _ from "underscore";
+import { useSetRecoilState } from "recoil";
 import { clientFetching } from "../recoil/clients";
 const API_BASE_URL = "http://localhost:3001";
 const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
@@ -13,10 +12,6 @@ export function ApiClientWrapper() {
 }
 
 export class APIClient extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return <div></div>;
   }
