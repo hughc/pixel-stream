@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { selector, useRecoilValue, useSetRecoilState } from "recoil";
+import {useRecoilValue, useSetRecoilState } from "recoil";
 import { clientId, clientsList } from "../recoil/clients";
 
 export function ClientList(props) {
@@ -14,7 +13,7 @@ export function ClientList(props) {
   const renderItem = (item) => {
     return (
       <div key={item.id} className="c-clients__single">
-        <a href="" data-target={item.id} onClick={selector}>
+        <a href="clients-{item-id}" data-target={item.id} onClick={selector}>
           {item.id}
         </a>
       </div>
