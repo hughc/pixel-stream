@@ -1,19 +1,11 @@
-import { useRecoilState, useSetRecoilState } from "recoil";
-import {
-  clientObject,
-  clientSelector,
-  clientsList,
-  CLIENT_API_URL,
-} from "../recoil/clients";
+import { useRecoilState } from "recoil";
+import { clientObject, clientsList, CLIENT_API_URL } from "../recoil/clients";
 import _ from "underscore";
 import { Button, Col, Form } from "react-bootstrap";
-import { saveClientList } from "../utils/Actions";
 
 export function ClientConfigForm(props) {
   const [clientObjectData] = useRecoilState(clientObject);
   const [clientlistData, clientsListSetter] = useRecoilState(clientsList);
-  const setClientLists = useSetRecoilState(clientsList);
-  const setClientSelector = useSetRecoilState(clientSelector);
 
   const inputChanged = function (e) {
     const allClientData = clientlistData.slice();
@@ -176,7 +168,7 @@ export function ClientConfigForm(props) {
       </Form>
     </div>
   ) : (
-    <div>we do not</div>
+    <div>Choose a client from the list to configure it.</div>
   );
 
   return <div>{body}</div>;

@@ -10,6 +10,7 @@ const staticImageBaseURL = "/image-preview";
 const imageDirectoryPath = "img";
 
 let clientsList = fs.readJSONSync("./data/clients.json");
+let imagesetsList = fs.readJSONSync("./data/imagesets.json");
 
 var path = require("path");
 var app = express();
@@ -68,9 +69,14 @@ app.get("/clients", (req, res) => {
   res.send(clientsList);
 });
 
+app.get("/imagesets", (req, res) => {
+  res.send(imagesetsList);
+});
+
 // sent by client on boot
 app.get("/checkin", (req, res) => {
   const params = { id: req.query.id, pixelsCount: req.query.pixels };
+  //. nly save if new
   saveClient(params, false);
   res.send("ok");
 });
@@ -95,6 +101,17 @@ app.post("/clients", function (req, res) {
   res.send({ success: true });
 });
 
+app.post("/imagesets", function (req, res) {
+  console.log(req.body);
+  var imagesetData = _.pick(req.body, "id", "name", "duration", "images");
+  if (!imagesetData.id) {
+    res.send({ success: false, error: "no client id supplied" });
+    return;
+  }
+  saveImageset(imagesetData, true);
+  res.send({ success: true });
+});
+
 function saveClient(clientData, overWriteFlag) {
   existingClient = _.findWhere(clientsList, { id: clientData.id });
   if (existingClient && overWriteFlag) {
@@ -105,6 +122,18 @@ function saveClient(clientData, overWriteFlag) {
     clientsList.push(clientData);
   }
   fs.writeJSONSync("./data/clients.json", clientsList);
+}
+
+function saveImageset(imagesetData, overWriteFlag) {
+  existingImageset = _.findWhere(imagesetsList, { id: imagesetData.id });
+  if (existingImageset && overWriteFlag) {
+    const pos = imagesetsList.indexOf(existingImageset);
+    imagesetsList.splice(pos, 1, imagesetData);
+    console.log({ imagesetsList });
+  } else if (!existingImageset) {
+    imagesetsList.push(imagesetData);
+  }
+  fs.writeJSONSync("./data/imagesets.json", imagesetsList);
 }
 
 app.get("/image", (req, res) => {

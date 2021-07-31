@@ -1,14 +1,13 @@
 import "./css/App.scss";
 import { Container, Row, Col } from "react-bootstrap";
 
-//import ImageTable from './components/ImageTable';
-import { ImageSorter } from "./components/ImageSorter";
 import Header from "./components/Header";
 import { Component } from "react";
 import LinkList from "./components/LinkList";
 import { Welcome } from "./components/Welcome";
 import ClientConfig from "./components/ClientConfig";
 import { RecoilRoot } from "recoil";
+import ImagesetConfig from "./components/ImagesetConfig";
 
 class App extends Component {
   constructor() {
@@ -20,7 +19,7 @@ class App extends Component {
     let mainContent;
     switch (this.state.currentScreen) {
       case "imagesorter":
-        mainContent = <ImageSorter />;
+        mainContent = <ImagesetConfig />;
         break;
       case "welcome":
         mainContent = <Welcome />;

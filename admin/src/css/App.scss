@@ -13,17 +13,22 @@ html {
   }
 }
 
-.a {
+.c-draggable {
   &-list {
     background: #efefef;
-    padding: 10px;
-    border-radius: 10px;
-    &-image {
-      width: 32px;
-      height: auto;
-      margin: 10px;
-    }
+    padding: 5px;
+    border-radius: 20px;
   }
+  &-image {
+    width: 32px;
+    height: auto;
+  }
+  margin: 5px;
+  margin: 10px;
+  background: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  border: none;
 }
 
 .drop-zone {
