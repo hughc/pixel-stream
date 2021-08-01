@@ -16,7 +16,7 @@ export function ImageSorter() {
     console.log({ getImages });
     return _.map(getImages, (image) => {
       return (
-        <Draggable className="c-draggable" id={image.path}>
+        <Draggable id={image.path}>
           <img
             class="c-draggable-image"
             alt={image.img.replace(/.png|.gif|.jpg/g, "")}

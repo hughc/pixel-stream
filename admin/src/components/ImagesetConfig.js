@@ -1,5 +1,6 @@
 import { Component, Suspense } from "react";
 import { Col, Container, Row } from "react-bootstrap";
+import { DragDropTest } from "./DragDropTest";
 import { ImagesetConfigForm } from "./ImagesetConfigForm";
 import { ImagesetList } from "./ImagesetList";
 
@@ -32,6 +33,7 @@ export default class ImagesetConfig extends Component {
             </Col>
             <Suspense fallback={<div>Loading...</div>}>
               <Col className="u-pad--20">
+                <DragDropTest />
                 <ImagesetConfigForm ImagesetId={this.state.userId} />
               </Col>
             </Suspense>
