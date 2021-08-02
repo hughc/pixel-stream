@@ -1,11 +1,17 @@
 import { Button } from "react-bootstrap";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import _ from "underscore";
-import { imagesetId, imagesetsList } from "../recoil/imagesets";
+import {
+  formImageSet,
+  imagesetId,
+  imagesetObject,
+  imagesetsList,
+} from "../recoil/imagesets";
 
 export function ImagesetList(props) {
   const imagesets = useRecoilValue(imagesetsList);
   const imagesetIdSetter = useSetRecoilState(imagesetId);
+  const [imagesetObjectData] = useRecoilState(imagesetObject);
 
   const selector = (e) => {
     e.preventDefault();
@@ -15,6 +21,7 @@ export function ImagesetList(props) {
   const newImageset = (e) => {
     const currentHighestId = _.max(_.pluck(imagesets, "id"));
     console.log(imagesets);
+    //  debugger;
     imagesetIdSetter((oldId) =>
       currentHighestId > 0 ? currentHighestId + 1 : 1
     );

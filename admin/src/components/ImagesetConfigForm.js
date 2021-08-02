@@ -1,5 +1,6 @@
-import { useRecoilState } from "recoil";
+import { atom, useRecoilState } from "recoil";
 import {
+  formImageSet,
   imagesetObject,
   imagesetsList,
   IMAGESET_API_URL,
@@ -7,32 +8,37 @@ import {
 import _ from "underscore";
 import { Button, Col, Form } from "react-bootstrap";
 import { ImageSorter } from "./ImageSorter";
+import { useState } from "react";
 
 export function ImagesetConfigForm(props) {
   const [imagesetObjectData] = useRecoilState(imagesetObject);
   const [imagesetlistData, imagesetsListSetter] = useRecoilState(imagesetsList);
 
+  const [localState, setLocalState] = useRecoilState(formImageSet);
+
+  setLocalState((oldState) => {
+    return imagesetObjectData;
+  });
+
   const inputChanged = function (e) {
-    const allImagesetData = imagesetlistData.slice();
     let newValue =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
     newValue = e.target.type === "number" ? parseInt(newValue) : newValue;
 
-    const newImagesetObject = _.defaults(
-      { [e.target.name]: newValue },
-      { ...imagesetObjectData }
-    );
-    const oldObject = _.findWhere(allImagesetData, {
-      id: newImagesetObject.id,
-    });
-    const oldPos = allImagesetData.indexOf(oldObject);
-    allImagesetData.splice(oldPos, 1, newImagesetObject);
-    imagesetsListSetter(allImagesetData);
+    setLocalState(_.defaults({ [e.target.name]: newValue }, { ...localState }));
   };
 
   const handleSubmit = async (e) => {
     // nothing to gather, just send it
     e.preventDefault();
+
+    const allImagesetData = imagesetlistData.slice();
+    const oldObject = _.findWhere(allImagesetData, {
+      id: localState.id,
+    });
+    const oldPos = allImagesetData.indexOf(oldObject);
+    allImagesetData.splice(oldPos, 1, localState);
+    imagesetsListSetter(allImagesetData);
 
     const request = new Request(IMAGESET_API_URL, {
       method: "POST",
@@ -47,9 +53,14 @@ export function ImagesetConfigForm(props) {
     console.log(returnedData);
     if (returnedData.success) {
     }
-    console.log({ imagesetlistData });
   };
-  const body = imagesetObjectData ? (
+
+  const imageSelectionChanged = (imageIdList) => {
+    setLocalState({ ...localState, images: imageIdList });
+  };
+  console.log({ localState });
+
+  const body = !_.isEmpty(localState) ? (
     <div>
       <Form onSubmit={handleSubmit}>
         <Form.Row>
@@ -60,7 +71,7 @@ export function ImagesetConfigForm(props) {
                 name="id"
                 onChange={inputChanged}
                 type="text"
-                value={imagesetObjectData.id}
+                value={localState.id}
                 disabled
               />
               <Form.Text className="text-muted">
@@ -74,7 +85,7 @@ export function ImagesetConfigForm(props) {
               <Form.Control
                 name="name"
                 onChange={inputChanged}
-                value={imagesetObjectData.name}
+                value={localState.name}
               />
             </Form.Group>
           </Col>
@@ -85,7 +96,7 @@ export function ImagesetConfigForm(props) {
                 name="duration"
                 onChange={inputChanged}
                 type="number"
-                value={imagesetObjectData.duration}
+                value={localState.duration}
               />
               <Form.Text className="text-muted">
                 Time long each image displays for.
@@ -94,7 +105,10 @@ export function ImagesetConfigForm(props) {
           </Col>
         </Form.Row>
 
-        <ImageSorter />
+        <ImageSorter
+          images={localState.images}
+          changeCallback={imageSelectionChanged}
+        />
 
         <Form.Row>
           <Col>

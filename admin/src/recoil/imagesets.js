@@ -15,6 +15,11 @@ export const imagesetId = atom({
   default: 0,
 });
 
+export const formImageSet = atom({
+  key: "imageFormState",
+  default: {},
+});
+
 export const imagesetObject = selector({
   key: "imagesetObject",
   get: ({ get }) => {
@@ -22,15 +27,20 @@ export const imagesetObject = selector({
     const imagesetListValue = get(imagesetsList);
     if (!imagesetIdValue) return;
     return (
-      _.findWhere(imagesetListValue, { id: imagesetIdValue }) || {
-        id: imagesetIdValue,
-        name: "",
-        duration: 10,
-        images: [],
-      }
+      _.findWhere(imagesetListValue, { id: imagesetIdValue }) ||
+      emptyImageSet(imagesetIdValue)
     );
   },
 });
+
+export const emptyImageSet = (idValue) => {
+  return {
+    id: idValue,
+    name: "",
+    duration: 10,
+    images: [],
+  };
+};
 
 export const imagesetSelector = selector({
   key: "imagesetSelector",

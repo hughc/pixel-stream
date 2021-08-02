@@ -33,7 +33,6 @@ export default class ImagesetConfig extends Component {
             </Col>
             <Suspense fallback={<div>Loading...</div>}>
               <Col className="u-pad--20">
-                <DragDropTest />
                 <ImagesetConfigForm ImagesetId={this.state.userId} />
               </Col>
             </Suspense>

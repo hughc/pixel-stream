@@ -18,6 +18,10 @@ html {
     background: #efefef;
     padding: 5px;
     border-radius: 20px;
+    margin-bottom: 10px;
+    &-items {
+      min-height: 40px;
+    }
   }
   &-image {
     width: 32px;
@@ -29,6 +33,7 @@ html {
   padding: 5px;
   border-radius: 5px;
   border: none;
+  display: inline-block;
 }
 
 .drop-zone {
