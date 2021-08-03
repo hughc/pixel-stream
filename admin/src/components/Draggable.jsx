@@ -12,7 +12,7 @@ export function Draggable(props) {
     : undefined;
 
   return (
-    <div className="c-draggable" ref={setNodeRef} style={style} {...listeners} {...attributes}>
+    <div title={props.alt} className="c-draggable" ref={setNodeRef} style={style} {...listeners} {...attributes}>
       {props.children}
     </div>
   );

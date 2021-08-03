@@ -4,17 +4,19 @@ import _ from "underscore";
 import {
   formImageSet,
   imagesetId,
-  imagesetObject,
+  editorImageset,
   imagesetsList,
 } from "../recoil/imagesets";
 
 export function ImagesetList(props) {
   const imagesets = useRecoilValue(imagesetsList);
   const imagesetIdSetter = useSetRecoilState(imagesetId);
-  const [imagesetObjectData] = useRecoilState(imagesetObject);
+  const setCurrentFormData = useSetRecoilState(formImageSet);
 
   const selector = (e) => {
     e.preventDefault();
+    // clear existing object
+    setCurrentFormData({});
     imagesetIdSetter((oldId) => parseInt(e.target.dataset.target));
   };
 
@@ -22,6 +24,8 @@ export function ImagesetList(props) {
     const currentHighestId = _.max(_.pluck(imagesets, "id"));
     console.log(imagesets);
     //  debugger;
+    // clear existing object
+    setCurrentFormData({});
     imagesetIdSetter((oldId) =>
       currentHighestId > 0 ? currentHighestId + 1 : 1
     );

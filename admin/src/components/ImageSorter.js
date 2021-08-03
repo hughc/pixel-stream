@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DndContext } from "@dnd-kit/core";
 import { Draggable } from "./Draggable.jsx";
 import { Droppable } from "./Droppable.jsx";
@@ -11,27 +11,50 @@ import { API_BASE_URL } from "../recoil/imagesets.js";
 export function ImageSorter(props) {
   const [getImages] = useRecoilState(imagesList);
 
-  const [selectedIds, setSelectedIds] = useState(props.images);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [getFilter, setFilter] = useState("");
+
+  useEffect(() => {
+    setSelectedIds(props.images);
+  }, [props.images]);
+
+  const handleFilter = function (e) {
+    setFilter(e.target.value);
+  };
+  const clearFilter = function (e) {
+    setFilter("");
+  };
+
+  console.log({ images: props.images });
+  console.log({ selectedIds });
 
   const generateImages = (status) => {
     let source;
     if (status == "selected") {
-      source = _.filter(
-        getImages,
-        (image) => selectedIds.indexOf(image.path) > -1
+      source = _.compact(
+        _.map(selectedIds, (id) => _.findWhere(getImages, { path: id }))
       );
     } else {
       source = _.filter(
         getImages,
         (image) => selectedIds.indexOf(image.path) == -1
       );
+      if (getFilter.length > 2)
+        source = _.filter(
+          source,
+          (item) =>
+            item.path.toLowerCase().indexOf(getFilter.toLowerCase()) > -1
+        );
     }
     return _.map(source, (image) => {
       return (
-        <Draggable id={image.path}>
+        <Draggable
+          id={image.path}
+          alt={image.path.replace(/.png|.gif|.jpg/g, "")}
+        >
           <img
             class="c-draggable-image"
-            alt={image.img.replace(/.png|.gif|.jpg/g, "")}
+            alt={image.path.replace(/.png|.gif|.jpg/g, "")}
             src={`${API_BASE_URL}${image.path}`}
           />
         </Draggable>
@@ -42,7 +65,9 @@ export function ImageSorter(props) {
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="c-draggable-list">
-        <div className="c-draggable-list-label">Selected Images</div>
+        <div className="c-draggable-list-header">
+          <div className="c-draggable-list-label">Selected Images</div>
+        </div>
         <Droppable dropId="selectedImages" className="drop-zone">
           <div className="c-draggable-list-items">
             {generateImages("selected")}
@@ -50,7 +75,19 @@ export function ImageSorter(props) {
         </Droppable>
       </div>
       <div className="c-draggable-list">
-        <div className="c-draggable-list-label">All Images</div>
+        <div className="c-draggable-list-header">
+          <div className="c-draggable-list-label">All Images</div>
+          <div className="c-draggable-list-filter">
+            Filter:{" "}
+            <input type="text" onChange={handleFilter} value={getFilter} />
+            <div
+              className="c-draggable-list-filter-clear"
+              onClick={clearFilter}
+            >
+              X
+            </div>
+          </div>
+        </div>
         <Droppable dropId="allImages" className="drop-zone">
           <div className="c-draggable-list-items">
             {generateImages("unselected")}

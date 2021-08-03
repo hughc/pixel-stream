@@ -20,16 +20,26 @@ export const formImageSet = atom({
   default: {},
 });
 
-export const imagesetObject = selector({
+export const editorImageset = selector({
   key: "imagesetObject",
   get: ({ get }) => {
+    if (!_.isEmpty(get(formImageSet))) return get(formImageSet);
     const imagesetIdValue = get(imagesetId);
     const imagesetListValue = get(imagesetsList);
     if (!imagesetIdValue) return;
-    return (
-      _.findWhere(imagesetListValue, { id: imagesetIdValue }) ||
-      emptyImageSet(imagesetIdValue)
+    const rData = _.clone(
+      _.findWhere(imagesetListValue, { id: imagesetIdValue })
     );
+    if (rData) {
+      console.log(rData);
+      rData.images = rData.images ? rData.images.slice() : [];
+      return rData;
+    } else {
+      return emptyImageSet(imagesetIdValue);
+    }
+  },
+  set: ({ set }, value) => {
+    set(formImageSet, value);
   },
 });
 

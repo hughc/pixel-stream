@@ -19,6 +19,33 @@ html {
     padding: 5px;
     border-radius: 20px;
     margin-bottom: 10px;
+    &-header {
+      display: flex;
+      padding: 10px;
+      justify-content: space-between;
+    }
+    &-filter {
+      display: flex;
+      position: relative;
+      input {
+        margin-left: 10px;
+      }
+      &-clear {
+        position: absolute;
+        right: 5px;
+        top: 8px;
+        color: white;
+        background-color: #555;
+        border-radius: 50%;
+        width: 15px;
+        height: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1em;
+        font-size: 10px;
+      }
+    }
     &-items {
       min-height: 40px;
     }
@@ -28,7 +55,6 @@ html {
     height: auto;
   }
   margin: 5px;
-  margin: 10px;
   background: #fff;
   padding: 5px;
   border-radius: 5px;

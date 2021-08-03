@@ -1,31 +1,27 @@
 import { atom, useRecoilState } from "recoil";
 import {
-  formImageSet,
-  imagesetObject,
+  editorImageset,
   imagesetsList,
   IMAGESET_API_URL,
 } from "../recoil/imagesets";
 import _ from "underscore";
 import { Button, Col, Form } from "react-bootstrap";
 import { ImageSorter } from "./ImageSorter";
-import { useState } from "react";
 
 export function ImagesetConfigForm(props) {
-  const [imagesetObjectData] = useRecoilState(imagesetObject);
+  const [localState, setLocalState] = useRecoilState(editorImageset);
   const [imagesetlistData, imagesetsListSetter] = useRecoilState(imagesetsList);
-
-  const [localState, setLocalState] = useRecoilState(formImageSet);
-
-  setLocalState((oldState) => {
-    return imagesetObjectData;
-  });
-
+  console.log("loaded localState", localState);
   const inputChanged = function (e) {
     let newValue =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
     newValue = e.target.type === "number" ? parseInt(newValue) : newValue;
-
-    setLocalState(_.defaults({ [e.target.name]: newValue }, { ...localState }));
+    debugger;
+    const newLocalState = _.defaults(
+      { [e.target.name]: newValue },
+      { ...localState }
+    );
+    setLocalState(newLocalState);
   };
 
   const handleSubmit = async (e) => {
@@ -42,10 +38,9 @@ export function ImagesetConfigForm(props) {
 
     const request = new Request(IMAGESET_API_URL, {
       method: "POST",
-      body: JSON.stringify(imagesetObjectData),
+      body: JSON.stringify(localState),
       headers: {
         "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
 
