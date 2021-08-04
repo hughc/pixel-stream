@@ -15,8 +15,9 @@ export function ImageSorter(props) {
   const [getFilter, setFilter] = useState("");
 
   useEffect(() => {
-    setSelectedIds(props.images);
-  }, [props.images]);
+    console.log(`useEffect setSelectedIds ${props.selectedImageIds}`);
+    setSelectedIds(props.selectedImageIds);
+  }, [props.selectedImageIds]);
 
   const handleFilter = function (e) {
     setFilter(e.target.value);
@@ -25,19 +26,19 @@ export function ImageSorter(props) {
     setFilter("");
   };
 
-  console.log({ images: props.images });
+  console.log(`using props.selectedImageIds: ${props.selectedImageIds}`);
   console.log({ selectedIds });
 
   const generateImages = (status) => {
     let source;
-    if (status == "selected") {
+    if (status === "selected") {
       source = _.compact(
         _.map(selectedIds, (id) => _.findWhere(getImages, { path: id }))
       );
     } else {
       source = _.filter(
         getImages,
-        (image) => selectedIds.indexOf(image.path) == -1
+        (image) => selectedIds.indexOf(image.path) === -1
       );
       if (getFilter.length > 2)
         source = _.filter(
@@ -53,7 +54,7 @@ export function ImageSorter(props) {
           alt={image.path.replace(/.png|.gif|.jpg/g, "")}
         >
           <img
-            class="c-draggable-image"
+            className="c-draggable-image"
             alt={image.path.replace(/.png|.gif|.jpg/g, "")}
             src={`${API_BASE_URL}${image.path}`}
           />
@@ -101,15 +102,15 @@ export function ImageSorter(props) {
   );
 
   function handleDragEnd(event) {
-    var hasUpdated = false;
+    let hasUpdated = false;
+    let newImageList;
     if (event.over && event.over.id === "selectedImages") {
-      console.log({ event });
       const draggedId = event.active.id;
       const alreadySelected = _.contains(selectedIds, draggedId);
       if (alreadySelected) return;
-      const newImageList = selectedIds.slice();
+      newImageList = selectedIds.slice();
       newImageList.push(draggedId);
-      setSelectedIds(newImageList);
+      //   setSelectedIds(newImageList);
       hasUpdated = true;
     }
     if (event.over && event.over.id === "allImages") {
@@ -117,11 +118,13 @@ export function ImageSorter(props) {
       const draggedId = event.active.id;
       const alreadySelected = _.contains(selectedIds, draggedId);
       if (!alreadySelected) return;
-      const newImageList = _.clone(selectedIds);
+      newImageList = _.clone(selectedIds);
       newImageList.splice(selectedIds.indexOf(draggedId), 1);
-      setSelectedIds(newImageList);
+      //  setSelectedIds(newImageList);
       hasUpdated = true;
     }
-    if (hasUpdated) props.changeCallback(selectedIds);
+    if (hasUpdated) {
+      props.changeCallback(newImageList);
+    }
   }
 }

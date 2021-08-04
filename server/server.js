@@ -112,6 +112,12 @@ app.post("/imagesets", function (req, res) {
   res.send({ success: true });
 });
 
+app.post("/imageset", function (req, res) {
+  console.log(req.body);
+  saveAllImageset(imagesetData, req.body);
+  res.send({ success: true });
+});
+
 function saveClient(clientData, overWriteFlag) {
   existingClient = _.findWhere(clientsList, { id: clientData.id });
   if (existingClient && overWriteFlag) {
@@ -134,6 +140,9 @@ function saveImageset(imagesetData, overWriteFlag) {
     imagesetsList.push(imagesetData);
   }
   fs.writeJSONSync("./data/imagesets.json", imagesetsList);
+}
+function saveAllImageset(imagesetData) {
+  fs.writeJSONSync("./data/imagesets.json", imagesetData);
 }
 
 app.get("/image", (req, res) => {

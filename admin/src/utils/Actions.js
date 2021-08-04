@@ -1,18 +1,15 @@
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { CLIENT_API_URL } from "../recoil/clients";
+import { IMAGESET_API_URL } from "../recoil/imagesets";
 
-export const saveClientList = (data) => async () => {
-  const form_data = new FormData();
-
-  for (var key in data) {
-    form_data.append(key, data[key]);
-  }
-
-  const request = new Request(CLIENT_API_URL, {
+export const saveClientList = (passedState) => async () => {
+  const request = new Request(IMAGESET_API_URL, {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(passedState),
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
-  const apiData = await fetch(request).then((res) => res.json());
-  return apiData;
+  const returnedData = await fetch(request).then((res) => res.json());
+  if (returnedData.success) {
+  }
 };

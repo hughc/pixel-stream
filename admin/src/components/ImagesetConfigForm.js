@@ -1,4 +1,4 @@
-import { atom, useRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import {
   editorImageset,
   imagesetsList,
@@ -7,16 +7,18 @@ import {
 import _ from "underscore";
 import { Button, Col, Form } from "react-bootstrap";
 import { ImageSorter } from "./ImageSorter";
+import { ConfirmationModal } from "./ConfirmationModal";
+import { useState } from "react";
+import { saveClientList } from "../utils/Actions";
 
 export function ImagesetConfigForm(props) {
   const [localState, setLocalState] = useRecoilState(editorImageset);
   const [imagesetlistData, imagesetsListSetter] = useRecoilState(imagesetsList);
-  console.log("loaded localState", localState);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const inputChanged = function (e) {
     let newValue =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
     newValue = e.target.type === "number" ? parseInt(newValue) : newValue;
-    debugger;
     const newLocalState = _.defaults(
       { [e.target.name]: newValue },
       { ...localState }
@@ -24,36 +26,42 @@ export function ImagesetConfigForm(props) {
     setLocalState(newLocalState);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => async () => {
     // nothing to gather, just send it
     e.preventDefault();
-
     const allImagesetData = imagesetlistData.slice();
     const oldObject = _.findWhere(allImagesetData, {
       id: localState.id,
     });
-    const oldPos = allImagesetData.indexOf(oldObject);
-    allImagesetData.splice(oldPos, 1, localState);
+    if (oldObject) {
+      const oldPos = allImagesetData.indexOf(oldObject);
+      allImagesetData.splice(oldPos, 1, localState);
+    } else {
+      // add to the end
+      allImagesetData.push(localState);
+    }
+
     imagesetsListSetter(allImagesetData);
+    saveClientList(allImagesetData);
+  };
 
-    const request = new Request(IMAGESET_API_URL, {
-      method: "POST",
-      body: JSON.stringify(localState),
-      headers: {
-        "Content-Type": "application/json",
-      },
+  const deleteCurrentConfig = (e) => async () => {
+    const allImagesetData = imagesetlistData.slice();
+    const oldObject = _.findWhere(allImagesetData, {
+      id: localState.id,
     });
-
-    const returnedData = await fetch(request).then((res) => res.json());
-    console.log(returnedData);
-    if (returnedData.success) {
+    debugger;
+    if (oldObject) {
+      const oldPos = allImagesetData.indexOf(oldObject);
+      allImagesetData.splice(oldPos, 1);
+      imagesetsListSetter(allImagesetData);
+      saveClientList(allImagesetData);
     }
   };
 
   const imageSelectionChanged = (imageIdList) => {
     setLocalState({ ...localState, images: imageIdList });
   };
-  console.log({ localState });
 
   const body = !_.isEmpty(localState) ? (
     <div>
@@ -101,7 +109,7 @@ export function ImagesetConfigForm(props) {
         </Form.Row>
 
         <ImageSorter
-          images={localState.images}
+          selectedImageIds={localState.images}
           changeCallback={imageSelectionChanged}
         />
 
@@ -111,10 +119,28 @@ export function ImagesetConfigForm(props) {
               <Button variant="primary" type="submit">
                 Save Config
               </Button>
+              <Button
+                variant=""
+                onClick={(e) => {
+                  e.preventDefault();
+                  setConfirmModalVisible(true);
+                }}
+              >
+                Delete Config
+              </Button>
             </Form.Group>
           </Col>
         </Form.Row>
       </Form>
+      <ConfirmationModal
+        show={confirmModalVisible}
+        onAccept={(e) => {
+          setConfirmModalVisible(false);
+          deleteCurrentConfig();
+        }}
+        onDecline={() => setConfirmModalVisible(false)}
+        title={localState.name}
+      />{" "}
     </div>
   ) : (
     <div>Choose a imageset from the list to configure it.</div>

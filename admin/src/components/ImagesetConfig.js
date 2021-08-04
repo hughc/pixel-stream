@@ -1,6 +1,5 @@
 import { Component, Suspense } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import { DragDropTest } from "./DragDropTest";
 import { ImagesetConfigForm } from "./ImagesetConfigForm";
 import { ImagesetList } from "./ImagesetList";
 
