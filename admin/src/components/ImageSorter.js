@@ -27,35 +27,35 @@ export function ImageSorter(props) {
   };
 
   console.log(`using props.selectedImageIds: ${props.selectedImageIds}`);
-  console.log({ selectedIds });
+  // console.log({ selectedIds });
 
   const generateImages = (status) => {
     let source;
     if (status === "selected") {
       source = _.compact(
-        _.map(selectedIds, (id) => _.findWhere(getImages, { path: id }))
+        _.map(selectedIds, (id) => _.findWhere(getImages, { id }))
       );
     } else {
       source = _.filter(
         getImages,
-        (image) => selectedIds.indexOf(image.path) === -1
+        (image) => selectedIds.indexOf(image.id) === -1
       );
       if (getFilter.length > 2)
         source = _.filter(
           source,
-          (item) =>
-            item.path.toLowerCase().indexOf(getFilter.toLowerCase()) > -1
+          (item) => item.id.toLowerCase().indexOf(getFilter.toLowerCase()) > -1
         );
     }
     return _.map(source, (image) => {
       return (
         <Draggable
-          id={image.path}
-          alt={image.path.replace(/.png|.gif|.jpg/g, "")}
+          id={image.id}
+          alt={image.id.replace(/.png|.gif|.jpg/g, "")}
+          key={image.id}
         >
           <img
             className="c-draggable-image"
-            alt={image.path.replace(/.png|.gif|.jpg/g, "")}
+            alt={image.id.replace(/.png|.gif|.jpg/g, "")}
             src={`${API_BASE_URL}${image.path}`}
           />
         </Draggable>

@@ -3,6 +3,7 @@ import _ from "underscore";
 
 export const API_BASE_URL = "http://localhost:3001";
 export const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
+export const IMAGE_UPLOAD_URL = `${API_BASE_URL}/upload`;
 
 export const imageFetching = atom({
   key: "imageFetching",
@@ -45,4 +46,15 @@ export const imageSelector = selector({
 export const imagesList = atom({
   key: "imagesList",
   default: imageSelector,
+});
+
+export const anImage = selector({
+  key: "randomImage",
+  get: ({ get }) => {
+    const allImages = get(imagesList);
+    const thisImage =
+      allImages[Math.round(Math.random() * 100000) % allImages.length];
+    console.log({ thisImage });
+    return thisImage;
+  },
 });

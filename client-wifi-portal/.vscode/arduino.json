@@ -1,0 +1,6 @@
+{
+    "port": "COM6",
+    "configuration": "FlashFreq=80,PartitionScheme=default,CPUFreq=240,UploadSpeed=921600",
+    "board": "esp32:esp32:d1_mini32",
+    "sketch": "client-wifi-portal.ino"
+}

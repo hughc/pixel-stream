@@ -19,15 +19,18 @@ FASTLED_USING_NAMESPACE
 //#define CLK_PIN   4
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
-#define SQUARE_SIZE "8"
+#define SQUARE_SIZE "16"
+#define UID_STRING "16tesst"
 #define NUM_LEDS 256
 
-
-#define BRIGHTNESS 25
+#define BRIGHTNESS 12
 
 #define FRAMES_PER_SECOND 60
 
-String jsonURL = "http://192.168.0.35:3000/image";
+String jsonURL = "http://192.168.0.85:3001/image";
+String helloBase = "http://192.168.0.85:3001/checkin";
+String helloURL = helloBase + "?id=" + UID_STRING + "&pixels=" + NUM_LEDS;
+String fullImageURL = jsonURL + "?id=" + UID_STRING + "&size=" + SQUARE_SIZE ;
 
 CRGB leds[NUM_LEDS];
 HTTPClient http;
@@ -375,7 +378,7 @@ bool initialConfig = false;
 // From v1.0.10 to permit disable/enable StaticIP configuration in Config Portal from sketch. Valid only if DHCP is used.
 // You'll loose the feature of dynamically changing from DHCP to static IP, or vice versa
 // You have to explicitly specify false to disable the feature.
-#define USE_STATIC_IP_CONFIG_IN_CP          false
+#define USE_STATIC_IP_CONFIG_IN_CP false
 
 // Use false to disable NTP config. Advisable when using Cellphone, Tablet to access Config Portal.
 // See Issue 23: On Android phone ConfigPortal is unresponsive (https://github.com/khoih-prog/ESP_WiFiManager/issues/23)
@@ -914,7 +917,6 @@ void setup()
 	//  fill_solid(blocks, , CRGB::Black);
 	FastLED.show();
 
-
 	Serial.print(F("\nStarting ConfigOnSwichFS using "));
 	Serial.print(FS_Name);
 	Serial.print(F(" on "));
@@ -1211,6 +1213,10 @@ void setup()
 	{
 		Serial.print(F("connected. Local IP: "));
 		Serial.println(WiFi.localIP());
+
+		fill_solid(leds, NUM_LEDS, CRGB::Green);
+		FastLED.show();
+		checkin();
 	}
 	else
 		Serial.println(ESP_wifiManager.getStatus(WiFi.status()));
@@ -1448,6 +1454,20 @@ void loop()
 	}
 }
 
+void checkin()
+{
+
+	Serial.println(helloURL);
+	http.begin(helloURL.c_str());
+
+	// Send HTTP GET request
+	int httpResponseCode = http.GET();
+	Serial.print("Checkin,  Response code: ");
+	Serial.println(httpResponseCode);
+	http.end();
+
+	// Send HTTP GET request
+}
 
 void getImage()
 {
@@ -1456,12 +1476,11 @@ void getImage()
 	// http.begin(jsonURL);
 	// http.GET();
 
-	String serverPath = jsonURL + "?size=" + SQUARE_SIZE;
 
-	Serial.print("serverPath: ");
-	Serial.println(serverPath);
+	Serial.print("jsonURL: ");
+	Serial.println(fullImageURL);
 	// Your Domain name with URL path or IP address with path
-	http.begin(serverPath.c_str());
+	http.begin(fullImageURL.c_str());
 
 	// Send HTTP GET request
 	int httpResponseCode = http.GET();

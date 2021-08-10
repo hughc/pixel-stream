@@ -1,11 +1,1 @@
-[
-  {
-    "id": "one",
-    "pixelsCount": 1024,
-    "width": 32,
-    "height": 32,
-    "direction": "horizontal",
-    "zigzag": true,
-    "start": "bottomleft"
-  }
-]
+[{"id":"one","name":"dave","pixelsCount":1024,"width":32,"height":32,"direction":"horizontal","zigzag":true,"start":"bottomleft","imagesetId":"3"},{"id":"dave","name":"Small Grid","pixelsCount":"256","width":8,"height":8,"direction":"horizontal","zigzag":true,"start":"topleft","imagesetId":"2"},{"id":"16tesst","name":"16 by 16","pixelsCount":"256","width":16,"height":16,"direction":"horizontal","zigzag":true,"start":"bottomleft","imagesetId":"1"}]

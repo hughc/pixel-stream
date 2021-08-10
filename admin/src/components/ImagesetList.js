@@ -18,7 +18,6 @@ export function ImagesetList(props) {
   const newImageset = (e) => {
     const currentHighestId = _.max(_.pluck(imagesets, "id"));
     console.log(imagesets);
-    debugger;
     // clear existing object
     setCurrentFormData({});
     imagesetIdSetter((oldId) =>
@@ -38,10 +37,15 @@ export function ImagesetList(props) {
 
   return (
     <div className="c-clients">
-      <h4>Image Sets List:</h4>
+      <h4>Playlists:</h4>
       <div>{imagesets.map(renderItem)}</div>
-      <Button onClick={newImageset} variant="primary" type="submit">
-        New Imageset
+      <Button
+        className="u-margin--top-20"
+        onClick={newImageset}
+        variant="light"
+        type="submit"
+      >
+        New Playlist
       </Button>
     </div>
   );

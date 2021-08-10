@@ -1,26 +1,32 @@
+import { Button, ButtonGroup } from "react-bootstrap";
+
 export default function LinkList(props) {
   return (
-    <ul className="c-link-list">
-      <li>
-        <a
-          href="#clients"
-          className={props.activeScreen === "clientconfig" ? "is-active" : ""}
-          data-target="clientconfig"
-          onClick={props.onClick}
-        >
-          Clients
-        </a>
-      </li>
-      <li>
-        <a
-          href="#imagesets"
-          className={props.activeScreen === "imagesorter" ? "is-active" : ""}
-          data-target="imagesorter"
-          onClick={props.onClick}
-        >
-          Image Sets
-        </a>
-      </li>
-    </ul>
+    <ButtonGroup className="c-link-list" aria-label="First group">
+      <Button
+        variant="light"
+        className={props.activeScreen === "imageupload" ? "is-active" : ""}
+        data-target="imageupload"
+        onClick={props.onClick}
+      >
+        Images
+      </Button>
+      <Button
+        variant="light"
+        className={props.activeScreen === "clientconfig" ? "is-active" : ""}
+        data-target="clientconfig"
+        onClick={props.onClick}
+      >
+        Clients
+      </Button>
+      <Button
+        variant="light"
+        className={props.activeScreen === "imagesorter" ? "is-active" : ""}
+        data-target="imagesorter"
+        onClick={props.onClick}
+      >
+        Playlists
+      </Button>
+    </ButtonGroup>
   );
 }

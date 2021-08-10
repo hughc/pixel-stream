@@ -2,10 +2,12 @@ import { useRecoilState } from "recoil";
 import { clientObject, clientsList, CLIENT_API_URL } from "../recoil/clients";
 import _ from "underscore";
 import { Button, Col, Form } from "react-bootstrap";
+import { imagesetsList } from "../recoil/imagesets";
 
 export function ClientConfigForm(props) {
   const [clientObjectData] = useRecoilState(clientObject);
   const [clientlistData, clientsListSetter] = useRecoilState(clientsList);
+  const [imagesets] = useRecoilState(imagesetsList);
 
   const inputChanged = function (e) {
     const allClientData = clientlistData.slice();
@@ -53,8 +55,20 @@ export function ClientConfigForm(props) {
     <div>
       <Form onSubmit={handleSubmit}>
         <Form.Row>
-          <Col>
-            <Form.Group className="mb-3" controlId="clientId">
+          <Col sm="6">
+            <Form.Group controlId="clientId">
+              <Form.Label>Client Name</Form.Label>
+              <Form.Control
+                name="name"
+                onChange={inputChanged}
+                type="text"
+                value={clientObjectData.name}
+              />
+            </Form.Group>
+          </Col>
+
+          <Col sm="3">
+            <Form.Group controlId="clientId">
               <Form.Label>Client ID</Form.Label>
               <Form.Control
                 name="id"
@@ -68,8 +82,8 @@ export function ClientConfigForm(props) {
               </Form.Text>
             </Form.Group>
           </Col>
-          <Col>
-            <Form.Group className="mb-3" controlId="pixelsCount">
+          <Col sm="3">
+            <Form.Group controlId="pixelsCount">
               <Form.Label>Pixels count</Form.Label>
               <Form.Control
                 name="pixelsCount"
@@ -86,7 +100,7 @@ export function ClientConfigForm(props) {
         </Form.Row>
         <Form.Row>
           <Col sm="2">
-            <Form.Group className="mb-3" controlId="width">
+            <Form.Group controlId="width">
               <Form.Label>Pixel width</Form.Label>
               <Form.Control
                 name="width"
@@ -97,7 +111,7 @@ export function ClientConfigForm(props) {
             </Form.Group>
           </Col>
           <Col sm="2">
-            <Form.Group className="mb-3" controlId="height">
+            <Form.Group controlId="height">
               <Form.Label>Pixel height</Form.Label>
               <Form.Control
                 name="height"
@@ -152,6 +166,29 @@ export function ClientConfigForm(props) {
               <Form.Text className="text-muted">
                 Do the rows zigzag? If false, they are assumed to start at the
                 same end.
+              </Form.Text>
+            </Form.Group>
+          </Col>
+        </Form.Row>
+        <Form.Row>
+          <Col>
+            <Form.Group className="sm-3" controlId="imagesetId">
+              <Form.Control
+                as="select"
+                label="Zigzag rows"
+                name="imagesetId"
+                onChange={inputChanged}
+                value={clientObjectData.imagesetId}
+              >
+                {imagesets.map((imageset, index) => (
+                  <option key={index} value={imageset.id}>
+                    {imageset.name}
+                  </option>
+                ))}
+              </Form.Control>
+              <Form.Text className="text-muted">
+                Do the rows imagesetId? If false, they are assumed to start at
+                the same end.
               </Form.Text>
             </Form.Group>
           </Col>

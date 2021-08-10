@@ -18,7 +18,7 @@ export default class ImagesetConfig extends Component {
     return (
       <div>
         <div className="u-pad--20">
-          <h4>Imageset config manager</h4>
+          <h4>Playlist manager</h4>
         </div>
         <Container fluid className="u-h--1">
           <Row className="u-h--1">

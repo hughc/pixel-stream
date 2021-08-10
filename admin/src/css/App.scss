@@ -11,6 +11,22 @@ html {
     background-color: theme-color("primary");
     color: color("white");
   }
+  .c-header {
+    &-title {
+      line-height: 1em;
+    }
+    img {
+      width: 32px;
+      height: 32px;
+    }
+    color: white;
+    a {
+      color: white;
+    }
+    &-background {
+      background-color: theme-color("primary");
+    }
+  }
 }
 
 .c-draggable {
@@ -61,6 +77,18 @@ html {
   border: none;
   display: inline-block;
 }
+.c-filedropzone {
+  background-color: #eee;
+  border-radius: 10px;
+  padding: 20px;
+  &-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border: 4px dashed #aaa;
+  }
+}
 
 .drop-zone {
   background-color: red;
@@ -70,15 +98,11 @@ html {
   &-link-list {
     list-style: none;
     padding: 0;
-    li {
-      a {
-        display: block;
-        color: white;
-        padding: 5px;
-        &.is-active {
-          border: 1px dotted white;
-        }
-      }
+    display: flex;
+    justify-self: flex-end;
+
+    .btn.is-active {
+      background-color: #aaf;
     }
   }
   &-clients {

@@ -30,11 +30,11 @@ $font-size-list: (
   16: 16px,
   14: 14px,
   // source references
-  12: 12px
+  12: 12px,
 );
 
-$margin-list: 20 30 60 90 120;
-$padding-list: 10 15 20 30 40 50;
+$margin-list: 0 20 30 60 90 120;
+$padding-list: 0 10 15 20 30 40 50;
 
 $leading: 6px;
 
@@ -76,8 +76,8 @@ $leading: 6px;
   @if $leading {
     line-height: $font-size + $leading;
   } @else {
-  line-height: get-line-height($size);
-}
+    line-height: get-line-height($size);
+  }
 }
 
 // Font weight
@@ -88,7 +88,7 @@ $font-weight-list: (
   normal: 400,
   medium: 500,
   demi: 600,
-  bold: 700
+  bold: 700,
 );
 
 @function get-font-weight($weight) {
@@ -107,27 +107,27 @@ $font-weight-list: (
 // Colours
 
 $colour-list: (
-  cobalt: #2206C2,
-  light-blue: #6D57FF,
-  purple: #7A06EE,
-  violet: #C702E6,
-  orange: #FF3111,
-  lime: #CBFE3A,
-  cyan: #0EFBED,
-  light-blue-grey: #F0F0F5,
+  cobalt: #2206c2,
+  light-blue: #6d57ff,
+  purple: #7a06ee,
+  violet: #c702e6,
+  orange: #ff3111,
+  lime: #cbfe3a,
+  cyan: #0efbed,
+  light-blue-grey: #f0f0f5,
   black: #000000,
-  grey-900: #1A1A1A,
+  grey-900: #1a1a1a,
   grey-850: #191919,
   grey-800: #333333,
-  grey-700: #4D4D4D,
+  grey-700: #4d4d4d,
   grey-600: #666666,
   grey-500: #808080,
   grey-400: #999999,
-  grey-300: #B2B2B2,
-  grey-200: #CCCCCC,
-  grey-100: #E5E5E5,
-  grey-040: #F5F5F5,
-  white: #FFFFFF
+  grey-300: #b2b2b2,
+  grey-200: #cccccc,
+  grey-100: #e5e5e5,
+  grey-040: #f5f5f5,
+  white: #ffffff,
 );
 
 @function colour($colour-name) {
@@ -156,7 +156,7 @@ $header-height: 160px;
 
 $dimensions: (
   width: 1920px,
-  height: 1080px
+  height: 1080px,
 );
 
 $slide-width: 1920px;
@@ -200,5 +200,5 @@ $preso-modes: (
   screenshot-thumbnail: "screenshot-thumbnail",
   screenshot-full: "screenshot-full",
   client: "client",
-  master: "master"
+  master: "master",
 );
