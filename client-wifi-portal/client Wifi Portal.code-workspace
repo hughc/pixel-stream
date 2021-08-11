@@ -1,8 +1,12 @@
 {
   "folders": [
-    {
-      "path": "."
-    }
-  ],
+		{
+			"path": "."
+		},
+		{
+			"name": "210811-213952-d1_mini",
+			"path": "..\\..\\..\\Users\\Hugh\\Documents\\PlatformIO\\Projects\\210811-213952-d1_mini"
+		}
+	],
   "settings": {}
 }

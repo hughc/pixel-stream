@@ -201,10 +201,10 @@ app.get("/image", (req, res) => {
   imageset.index = index + 1;
   console.log({ path });
 
-  var metadata = _.findWhere(imageStatsCache, {
+  /* var metadata = _.findWhere(imageStatsCache, {
     id: path,
   });
-  console.log(imageStatsCache[0]);
+  console.log(imageStatsCache[0]); */
 
   var dataP = getImgPixelsBuffer(`${imageDirectoryPath}/${path}`, sizeInt);
   return dataP.then((dataObj) => {
