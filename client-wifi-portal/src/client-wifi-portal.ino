@@ -19,18 +19,19 @@ FASTLED_USING_NAMESPACE
 //#define CLK_PIN   4
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
-#define SQUARE_SIZE "16"
-#define UID_STRING "16tesst"
-#define NUM_LEDS 256
+#define SQUARE_SIZE "32"
+#define UID_STRING "max-32"
+#define NUM_LEDS 1024
 
 #define BRIGHTNESS 12
 
 #define FRAMES_PER_SECOND 60
 
-String jsonURL = "http://192.168.0.85:3001/image";
-String helloBase = "http://192.168.0.85:3001/checkin";
+String pixelServerUrl = "";
+String jsonURL = pixelServerUrl + "/image";
+String helloBase = pixelServerUrl + "/checkin";
 String helloURL = helloBase + "?id=" + UID_STRING + "&pixels=" + NUM_LEDS;
-String fullImageURL = jsonURL + "?id=" + UID_STRING + "&size=" + SQUARE_SIZE ;
+String fullImageURL = "";
 
 CRGB leds[NUM_LEDS];
 HTTPClient http;
@@ -307,10 +308,12 @@ const char *CONFIG_FILE = "/ConfigSW.json";
 char thingspeakApiKey[17] = "";
 bool sensorDht22 = true;
 
-#define ThingSpeakAPI_Label "thingspeakApiKey"
-#define SensorDht22_Label "SensorDHT22"
-#define PinSDA_Label "PinSda"
-#define PinSCL_Label "PinScl"
+#define PixelServerUrl_Label "pixelServerUrl"
+
+//#define ThingSpeakAPI_Label "thingspeakApiKey"
+//#define SensorDht22_Label "SensorDHT22"
+//#define PinSDA_Label "PinSda"
+//#define PinSCL_Label "PinScl"
 
 // Function Prototypes
 
@@ -595,6 +598,11 @@ uint8_t connectMultiWiFi()
 	{
 		LOGERROR(F("WiFi not connected"));
 
+		if ((digitalRead(TRIGGER_PIN) == LOW) || (digitalRead(TRIGGER_PIN2) == LOW))
+		{
+			runConfigPortal();
+		}
+
 #if ESP8266
 		ESP.reset();
 #else
@@ -830,7 +838,17 @@ bool readConfigFile()
 
 		// Parse all config file parameters, override
 		// local config variables with parsed values
-		if (json.containsKey(ThingSpeakAPI_Label))
+		if (json.containsKey(PixelServerUrl_Label))
+		{
+			pixelServerUrl = json[PixelServerUrl_Label].as<String>();
+			Serial.print("pixelServerUrl: ");
+			Serial.println(pixelServerUrl);
+			jsonURL = pixelServerUrl + "/image";
+			helloBase = pixelServerUrl + "/checkin";
+			helloURL = helloBase + "?id=" + UID_STRING + "&pixels=" + NUM_LEDS;
+			fullImageURL = jsonURL + "?id=" + UID_STRING + "&size=" + SQUARE_SIZE;
+		}
+		/* if (json.containsKey(ThingSpeakAPI_Label))
 		{
 			strcpy(thingspeakApiKey, json[ThingSpeakAPI_Label]);
 		}
@@ -848,7 +866,7 @@ bool readConfigFile()
 		if (json.containsKey(PinSCL_Label))
 		{
 			pinScl = json[PinSCL_Label];
-		}
+		} */
 	}
 	Serial.println(F("\nConfig file was successfully parsed"));
 	return true;
@@ -866,10 +884,12 @@ bool writeConfigFile()
 #endif
 
 	// JSONify local configuration parameters
-	json[ThingSpeakAPI_Label] = thingspeakApiKey;
-	json[SensorDht22_Label] = sensorDht22;
-	json[PinSDA_Label] = pinSda;
-	json[PinSCL_Label] = pinScl;
+	json[PixelServerUrl_Label] = pixelServerUrl;
+	//	json[ThingSpeakAPI_Label] = thingspeakApiKey;
+	//json[ThingSpeakAPI_Label] = thingspeakApiKey;
+	//	json[SensorDht22_Label] = sensorDht22;
+	//	json[PinSDA_Label] = pinSda;
+	//	json[PinSCL_Label] = pinScl;
 
 	// Open file for writing
 	File f = FileFS.open(CONFIG_FILE, "w");
@@ -893,6 +913,13 @@ bool writeConfigFile()
 	f.close();
 
 	Serial.println(F("\nConfig file was successfully saved"));
+
+	// re-establish values
+	String jsonURL = pixelServerUrl + "/image";
+	String helloBase = pixelServerUrl + "/checkin";
+	String helloURL = helloBase + "?id=" + UID_STRING + "&pixels=" + NUM_LEDS;
+	String fullImageURL = "";
+
 	return true;
 }
 
@@ -1088,7 +1115,6 @@ void setup()
 #else
 		Serial.print(F("192.168.4.1"));
 #endif
-
 		Serial.print(F(", SSID = "));
 		Serial.print(ssid);
 		Serial.print(F(", PWD = "));
@@ -1229,214 +1255,7 @@ void loop()
 	// is configuration portal requested?
 	if ((digitalRead(TRIGGER_PIN) == LOW) || (digitalRead(TRIGGER_PIN2) == LOW))
 	{
-		Serial.println(F("\nConfiguration portal requested."));
-		digitalWrite(PIN_LED, LED_ON); // turn the LED on by making the voltage LOW to tell us we are in configuration mode.
-
-		//Local intialization. Once its business is done, there is no need to keep it around
-		ESP_WiFiManager ESP_wifiManager("ConfigOnSwitchFS");
-
-		//Check if there is stored WiFi router/password credentials.
-		//If not found, device will remain in configuration mode until switched off via webserver.
-		Serial.println(F("Opening configuration portal. "));
-
-		Router_SSID = ESP_wifiManager.WiFi_SSID();
-		Router_Pass = ESP_wifiManager.WiFi_Pass();
-
-		//Remove this line if you do not want to see WiFi password printed
-		Serial.println("ESP Self-Stored: SSID = " + Router_SSID + ", Pass = " + Router_Pass);
-
-		// From v1.1.0, Don't permit NULL password
-		if ((Router_SSID != "") && (Router_Pass != ""))
-		{
-			LOGERROR3(F("* Add SSID = "), Router_SSID, F(", PW = "), Router_Pass);
-			wifiMulti.addAP(Router_SSID.c_str(), Router_Pass.c_str());
-
-			ESP_wifiManager.setConfigPortalTimeout(120); //If no access point name has been previously entered disable timeout.
-			Serial.println(F("Got ESP Self-Stored Credentials. Timeout 120s for Config Portal"));
-		}
-		else if (loadConfigData())
-		{
-			ESP_wifiManager.setConfigPortalTimeout(120); //If no access point name has been previously entered disable timeout.
-			Serial.println(F("Got stored Credentials. Timeout 120s for Config Portal"));
-		}
-		else
-		{
-			// Enter CP only if no stored SSID on flash and file
-			Serial.println(F("Open Config Portal without Timeout: No stored Credentials."));
-			initialConfig = true;
-		}
-
-		// Extra parameters to be configured
-		// After connecting, parameter.getValue() will get you the configured value
-		// Format: <ID> <Placeholder text> <default value> <length> <custom HTML> <label placement>
-
-		// Thingspeak API Key - this is a straight forward string parameter
-		ESP_WMParameter p_thingspeakApiKey(ThingSpeakAPI_Label, "Thingspeak API Key", thingspeakApiKey, 17);
-
-		// DHT-22 sensor present or not - bool parameter visualized using checkbox, so couple of things to note
-		// - value is always 'T' for true. When the HTML form is submitted this is the value that will be
-		//   sent as a parameter. When unchecked, nothing will be sent by the HTML standard.
-		// - customhtml must be 'type="checkbox"' for obvious reasons. When the default is checked
-		//   append 'checked' too
-		// - labelplacement parameter is WFM_LABEL_AFTER for checkboxes as label has to be placed after the input field
-
-		char customhtml[24] = "type=\"checkbox\"";
-
-		if (sensorDht22)
-		{
-			strcat(customhtml, " checked");
-		}
-
-		ESP_WMParameter p_sensorDht22(SensorDht22_Label, "DHT-22 Sensor", "T", 2, customhtml, WFM_LABEL_AFTER);
-
-		// I2C SCL and SDA parameters are integers so we need to convert them to char array but
-		// no other special considerations
-		char convertedValue[3];
-		sprintf(convertedValue, "%d", pinSda);
-		ESP_WMParameter p_pinSda(PinSDA_Label, "I2C SDA pin", convertedValue, 3);
-		sprintf(convertedValue, "%d", pinScl);
-		ESP_WMParameter p_pinScl(PinSCL_Label, "I2C SCL pin", convertedValue, 3);
-
-		// Just a quick hint
-		ESP_WMParameter p_hint("<small>*Hint: if you want to reuse the currently active WiFi credentials, leave SSID and Password fields empty</small>");
-
-		//add all parameters here
-
-		ESP_wifiManager.addParameter(&p_hint);
-		ESP_wifiManager.addParameter(&p_thingspeakApiKey);
-		ESP_wifiManager.addParameter(&p_sensorDht22);
-		ESP_wifiManager.addParameter(&p_pinSda);
-		ESP_wifiManager.addParameter(&p_pinScl);
-
-		// Sets timeout in seconds until configuration portal gets turned off.
-		// If not specified device will remain in configuration mode until
-		// switched off via webserver or device is restarted.
-		// ESP_wifiManager.setConfigPortalTimeout(120);
-
-		ESP_wifiManager.setMinimumSignalQuality(-1);
-
-		// From v1.0.10 only
-		// Set config portal channel, default = 1. Use 0 => random channel from 1-13
-		ESP_wifiManager.setConfigPortalChannel(0);
-		//////
-
-#if USE_CUSTOM_AP_IP
-		//set custom ip for portal
-		// New in v1.4.0
-		ESP_wifiManager.setAPStaticIPConfig(WM_AP_IPconfig);
-		//////
-#endif
-
-#if !USE_DHCP_IP
-#if USE_CONFIGURABLE_DNS
-		// Set static IP, Gateway, Subnetmask, DNS1 and DNS2. New in v1.0.5
-		ESP_wifiManager.setSTAStaticIPConfig(stationIP, gatewayIP, netMask, dns1IP, dns2IP);
-#else
-		// Set static IP, Gateway, Subnetmask, Use auto DNS1 and DNS2.
-		ESP_wifiManager.setSTAStaticIPConfig(stationIP, gatewayIP, netMask);
-#endif
-#endif
-
-		// New from v1.1.1
-#if USING_CORS_FEATURE
-		ESP_wifiManager.setCORSHeader("Your Access-Control-Allow-Origin");
-#endif
-
-		// Start an access point
-		// and goes into a blocking loop awaiting configuration.
-		// Once the user leaves the portal with the exit button
-		// processing will continue
-		if (!ESP_wifiManager.startConfigPortal((const char *)ssid.c_str(), password.c_str()))
-		{
-			Serial.println(F("Not connected to WiFi but continuing anyway."));
-		}
-		else
-		{
-			//if you get here you have connected to the WiFi
-			Serial.println(F("connected...yeey :)"));
-			Serial.print(F("Local IP: "));
-			Serial.println(WiFi.localIP());
-		}
-
-		// Only clear then save data if CP entered and with new valid Credentials
-		// No CP => stored getSSID() = ""
-		if (String(ESP_wifiManager.getSSID(0)) != "" && String(ESP_wifiManager.getSSID(1)) != "")
-		{
-			// Stored  for later usage, from v1.1.0, but clear first
-			memset(&WM_config, 0, sizeof(WM_config));
-
-			for (uint8_t i = 0; i < NUM_WIFI_CREDENTIALS; i++)
-			{
-				String tempSSID = ESP_wifiManager.getSSID(i);
-				String tempPW = ESP_wifiManager.getPW(i);
-
-				if (strlen(tempSSID.c_str()) < sizeof(WM_config.WiFi_Creds[i].wifi_ssid) - 1)
-					strcpy(WM_config.WiFi_Creds[i].wifi_ssid, tempSSID.c_str());
-				else
-					strncpy(WM_config.WiFi_Creds[i].wifi_ssid, tempSSID.c_str(), sizeof(WM_config.WiFi_Creds[i].wifi_ssid) - 1);
-
-				if (strlen(tempPW.c_str()) < sizeof(WM_config.WiFi_Creds[i].wifi_pw) - 1)
-					strcpy(WM_config.WiFi_Creds[i].wifi_pw, tempPW.c_str());
-				else
-					strncpy(WM_config.WiFi_Creds[i].wifi_pw, tempPW.c_str(), sizeof(WM_config.WiFi_Creds[i].wifi_pw) - 1);
-
-				// Don't permit NULL SSID and password len < MIN_AP_PASSWORD_SIZE (8)
-				if ((String(WM_config.WiFi_Creds[i].wifi_ssid) != "") && (strlen(WM_config.WiFi_Creds[i].wifi_pw) >= MIN_AP_PASSWORD_SIZE))
-				{
-					LOGERROR3(F("* Add SSID = "), WM_config.WiFi_Creds[i].wifi_ssid, F(", PW = "), WM_config.WiFi_Creds[i].wifi_pw);
-					wifiMulti.addAP(WM_config.WiFi_Creds[i].wifi_ssid, WM_config.WiFi_Creds[i].wifi_pw);
-				}
-			}
-
-#if USE_ESP_WIFIMANAGER_NTP
-			String tempTZ = ESP_wifiManager.getTimezoneName();
-
-			if (strlen(tempTZ.c_str()) < sizeof(WM_config.TZ_Name) - 1)
-				strcpy(WM_config.TZ_Name, tempTZ.c_str());
-			else
-				strncpy(WM_config.TZ_Name, tempTZ.c_str(), sizeof(WM_config.TZ_Name) - 1);
-
-			const char *TZ_Result = ESP_wifiManager.getTZ(WM_config.TZ_Name);
-
-			if (strlen(TZ_Result) < sizeof(WM_config.TZ) - 1)
-				strcpy(WM_config.TZ, TZ_Result);
-			else
-				strncpy(WM_config.TZ, TZ_Result, sizeof(WM_config.TZ_Name) - 1);
-
-			if (strlen(WM_config.TZ_Name) > 0)
-			{
-				LOGERROR3(F("Saving current TZ_Name ="), WM_config.TZ_Name, F(", TZ = "), WM_config.TZ);
-
-#if ESP8266
-				configTime(WM_config.TZ, "pool.ntp.org");
-#else
-				//configTzTime(WM_config.TZ, "pool.ntp.org" );
-				configTzTime(WM_config.TZ, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
-#endif
-			}
-			else
-			{
-				LOGERROR(F("Current Timezone Name is not set. Enter Config Portal to set."));
-			}
-#endif
-
-			// New in v1.4.0
-			ESP_wifiManager.getSTAStaticIPConfig(WM_STA_IPconfig);
-			//////
-
-			saveConfigData();
-		}
-
-		// Getting posted form values and overriding local variables parameters
-		// Config file is written regardless the connection state
-		strcpy(thingspeakApiKey, p_thingspeakApiKey.getValue());
-		sensorDht22 = (strncmp(p_sensorDht22.getValue(), "T", 1) == 0);
-		pinSda = atoi(p_pinSda.getValue());
-		pinScl = atoi(p_pinScl.getValue());
-		// Writing JSON config file to flash for next boot
-		writeConfigFile();
-
-		digitalWrite(PIN_LED, LED_OFF); // Turn LED off as we are not in configuration mode.
+		runConfigPortal();
 	}
 
 	// Configuration portal not requested, so run normal loop
@@ -1452,6 +1271,222 @@ void loop()
 		//    Serial.print("remaining heap: ");
 		//    Serial.println(ESP.getFreeHeap(), DEC);
 	}
+}
+
+void runConfigPortal()
+{
+	Serial.println(F("\nConfiguration portal requested."));
+	digitalWrite(PIN_LED, LED_ON); // turn the LED on by making the voltage LOW to tell us we are in configuration mode.
+
+	//Local intialization. Once its business is done, there is no need to keep it around
+	ESP_WiFiManager ESP_wifiManager("ConfigOnSwitchFS");
+
+	//Check if there is stored WiFi router/password credentials.
+	//If not found, device will remain in configuration mode until switched off via webserver.
+	Serial.println(F("Opening configuration portal. "));
+
+	Router_SSID = ESP_wifiManager.WiFi_SSID();
+	Router_Pass = ESP_wifiManager.WiFi_Pass();
+
+	//Remove this line if you do not want to see WiFi password printed
+	Serial.println("ESP Self-Stored: SSID = " + Router_SSID + ", Pass = " + Router_Pass);
+
+	// From v1.1.0, Don't permit NULL password
+	if ((Router_SSID != "") && (Router_Pass != ""))
+	{
+		LOGERROR3(F("* Add SSID = "), Router_SSID, F(", PW = "), Router_Pass);
+		wifiMulti.addAP(Router_SSID.c_str(), Router_Pass.c_str());
+
+		ESP_wifiManager.setConfigPortalTimeout(120); //If no access point name has been previously entered disable timeout.
+		Serial.println(F("Got ESP Self-Stored Credentials. Timeout 120s for Config Portal"));
+	}
+	else if (loadConfigData())
+	{
+		ESP_wifiManager.setConfigPortalTimeout(120); //If no access point name has been previously entered disable timeout.
+		Serial.println(F("Got stored Credentials. Timeout 120s for Config Portal"));
+	}
+	else
+	{
+		// Enter CP only if no stored SSID on flash and file
+		Serial.println(F("Open Config Portal without Timeout: No stored Credentials."));
+		initialConfig = true;
+	}
+
+	// Extra parameters to be configured
+	// After connecting, parameter.getValue() will get you the configured value
+	// Format: <ID> <Placeholder text> <default value> <length> <custom HTML> <label placement>
+
+	// Thingspeak API Key - this is a straight forward string parameter
+	ESP_WMParameter p_pixelServerUrl(PixelServerUrl_Label, "Pixel Stream server URL", pixelServerUrl.c_str(), 32);
+	//		ESP_WMParameter p_thingspeakApiKey(ThingSpeakAPI_Label, "Thingspeak API Key", thingspeakApiKey, 17);
+
+	// DHT-22 sensor present or not - bool parameter visualized using checkbox, so couple of things to note
+	// - value is always 'T' for true. When the HTML form is submitted this is the value that will be
+	//   sent as a parameter. When unchecked, nothing will be sent by the HTML standard.
+	// - customhtml must be 'type="checkbox"' for obvious reasons. When the default is checked
+	//   append 'checked' too
+	// - labelplacement parameter is WFM_LABEL_AFTER for checkboxes as label has to be placed after the input field
+
+	// char customhtml[24] = "type=\"checkbox\"";
+
+	// if (sensorDht22)
+	// {
+	// 	strcat(customhtml, " checked");
+	// }
+
+	// ESP_WMParameter p_sensorDht22(SensorDht22_Label, "DHT-22 Sensor", "T", 2, customhtml, WFM_LABEL_AFTER);
+
+	// // I2C SCL and SDA parameters are integers so we need to convert them to char array but
+	// // no other special considerations
+	// char convertedValue[3];
+	// sprintf(convertedValue, "%d", pinSda);
+	// ESP_WMParameter p_pinSda(PinSDA_Label, "I2C SDA pin", convertedValue, 3);
+	// sprintf(convertedValue, "%d", pinScl);
+	// ESP_WMParameter p_pinScl(PinSCL_Label, "I2C SCL pin", convertedValue, 3);
+
+	// Just a quick hint
+	ESP_WMParameter p_hint("<small>*Hint: if you want to reuse the currently active WiFi credentials, leave SSID and Password fields empty</small>");
+
+	//add all parameters here
+
+	ESP_wifiManager.addParameter(&p_hint);
+	ESP_wifiManager.addParameter(&p_pixelServerUrl);
+	//ESP_wifiManager.addParameter(&p_thingspeakApiKey);
+	//ESP_wifiManager.addParameter(&p_sensorDht22);
+	//ESP_wifiManager.addParameter(&p_pinSda);
+	//ESP_wifiManager.addParameter(&p_pinScl);
+
+	// Sets timeout in seconds until configuration portal gets turned off.
+	// If not specified device will remain in configuration mode until
+	// switched off via webserver or device is restarted.
+	// ESP_wifiManager.setConfigPortalTimeout(120);
+
+	ESP_wifiManager.setMinimumSignalQuality(-1);
+
+	// From v1.0.10 only
+	// Set config portal channel, default = 1. Use 0 => random channel from 1-13
+	ESP_wifiManager.setConfigPortalChannel(0);
+	//////
+
+#if USE_CUSTOM_AP_IP
+	//set custom ip for portal
+	// New in v1.4.0
+	ESP_wifiManager.setAPStaticIPConfig(WM_AP_IPconfig);
+	//////
+#endif
+
+#if !USE_DHCP_IP
+#if USE_CONFIGURABLE_DNS
+	// Set static IP, Gateway, Subnetmask, DNS1 and DNS2. New in v1.0.5
+	ESP_wifiManager.setSTAStaticIPConfig(stationIP, gatewayIP, netMask, dns1IP, dns2IP);
+#else
+	// Set static IP, Gateway, Subnetmask, Use auto DNS1 and DNS2.
+	ESP_wifiManager.setSTAStaticIPConfig(stationIP, gatewayIP, netMask);
+#endif
+#endif
+
+	// New from v1.1.1
+#if USING_CORS_FEATURE
+	ESP_wifiManager.setCORSHeader("Your Access-Control-Allow-Origin");
+#endif
+
+	// Start an access point
+	// and goes into a blocking loop awaiting configuration.
+	// Once the user leaves the portal with the exit button
+	// processing will continue
+	if (!ESP_wifiManager.startConfigPortal((const char *)ssid.c_str(), password.c_str()))
+	{
+		Serial.println(F("Not connected to WiFi but continuing anyway."));
+	}
+	else
+	{
+		//if you get here you have connected to the WiFi
+		Serial.println(F("connected...yeey :)"));
+		Serial.print(F("Local IP: "));
+		Serial.println(WiFi.localIP());
+	}
+
+	// Only clear then save data if CP entered and with new valid Credentials
+	// No CP => stored getSSID() = ""
+	if (String(ESP_wifiManager.getSSID(0)) != "" && String(ESP_wifiManager.getSSID(1)) != "")
+	{
+		// Stored  for later usage, from v1.1.0, but clear first
+		memset(&WM_config, 0, sizeof(WM_config));
+
+		for (uint8_t i = 0; i < NUM_WIFI_CREDENTIALS; i++)
+		{
+			String tempSSID = ESP_wifiManager.getSSID(i);
+			String tempPW = ESP_wifiManager.getPW(i);
+
+			if (strlen(tempSSID.c_str()) < sizeof(WM_config.WiFi_Creds[i].wifi_ssid) - 1)
+				strcpy(WM_config.WiFi_Creds[i].wifi_ssid, tempSSID.c_str());
+			else
+				strncpy(WM_config.WiFi_Creds[i].wifi_ssid, tempSSID.c_str(), sizeof(WM_config.WiFi_Creds[i].wifi_ssid) - 1);
+
+			if (strlen(tempPW.c_str()) < sizeof(WM_config.WiFi_Creds[i].wifi_pw) - 1)
+				strcpy(WM_config.WiFi_Creds[i].wifi_pw, tempPW.c_str());
+			else
+				strncpy(WM_config.WiFi_Creds[i].wifi_pw, tempPW.c_str(), sizeof(WM_config.WiFi_Creds[i].wifi_pw) - 1);
+
+			// Don't permit NULL SSID and password len < MIN_AP_PASSWORD_SIZE (8)
+			if ((String(WM_config.WiFi_Creds[i].wifi_ssid) != "") && (strlen(WM_config.WiFi_Creds[i].wifi_pw) >= MIN_AP_PASSWORD_SIZE))
+			{
+				LOGERROR3(F("* Add SSID = "), WM_config.WiFi_Creds[i].wifi_ssid, F(", PW = "), WM_config.WiFi_Creds[i].wifi_pw);
+				wifiMulti.addAP(WM_config.WiFi_Creds[i].wifi_ssid, WM_config.WiFi_Creds[i].wifi_pw);
+			}
+		}
+
+#if USE_ESP_WIFIMANAGER_NTP
+		String tempTZ = ESP_wifiManager.getTimezoneName();
+
+		if (strlen(tempTZ.c_str()) < sizeof(WM_config.TZ_Name) - 1)
+			strcpy(WM_config.TZ_Name, tempTZ.c_str());
+		else
+			strncpy(WM_config.TZ_Name, tempTZ.c_str(), sizeof(WM_config.TZ_Name) - 1);
+
+		const char *TZ_Result = ESP_wifiManager.getTZ(WM_config.TZ_Name);
+
+		if (strlen(TZ_Result) < sizeof(WM_config.TZ) - 1)
+			strcpy(WM_config.TZ, TZ_Result);
+		else
+			strncpy(WM_config.TZ, TZ_Result, sizeof(WM_config.TZ_Name) - 1);
+
+		if (strlen(WM_config.TZ_Name) > 0)
+		{
+			LOGERROR3(F("Saving current TZ_Name ="), WM_config.TZ_Name, F(", TZ = "), WM_config.TZ);
+
+#if ESP8266
+			configTime(WM_config.TZ, "pool.ntp.org");
+#else
+			//configTzTime(WM_config.TZ, "pool.ntp.org" );
+			configTzTime(WM_config.TZ, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
+#endif
+		}
+		else
+		{
+			LOGERROR(F("Current Timezone Name is not set. Enter Config Portal to set."));
+		}
+#endif
+
+		// New in v1.4.0
+		ESP_wifiManager.getSTAStaticIPConfig(WM_STA_IPconfig);
+		//////
+
+		saveConfigData();
+	}
+
+	// Getting posted form values and overriding local variables parameters
+	// Config file is written regardless the connection state
+	pixelServerUrl = p_pixelServerUrl.getValue();
+	//	strcpy(thingspeakApiKey, p_thingspeakApiKey.getValue());
+	//	sensorDht22 = (strncmp(p_sensorDht22.getValue(), "T", 1) == 0);
+	//	pinSda = atoi(p_pinSda.getValue());
+	//	pinScl = atoi(p_pinScl.getValue());
+	// Writing JSON config file to flash for next boot
+	writeConfigFile();
+
+	digitalWrite(PIN_LED, LED_OFF); // Turn LED off as we are not in configuration mode.
+																	// end of config trigger branch
 }
 
 void checkin()
@@ -1473,9 +1508,6 @@ void getImage()
 {
 
 	// Send request
-	// http.begin(jsonURL);
-	// http.GET();
-
 
 	Serial.print("jsonURL: ");
 	Serial.println(fullImageURL);

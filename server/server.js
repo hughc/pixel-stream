@@ -176,7 +176,7 @@ app.get("/image", (req, res) => {
     res.send("255,0,255,255,255,0, 255,0,255");
     return;
   }
-  const imageset = _.findWhere(gImagesets, { id: parseInt(setup.imagesetId) });
+  let imageset = _.findWhere(gImagesets, { id: parseInt(setup.imagesetId) });
   if (!imageset) {
     console.warn(`imageset id ${imageset}`);
     imageset = gImagesets[0];
