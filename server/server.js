@@ -31,7 +31,7 @@ app.use(express.json({ type: "application/json)" }));
 app.use(express.json());
 
 app.post("/upload", function (req, res) {
-  console.log(req.files);
+  //console.log(req.files);
 
   if (!req.files || Object.keys(req.files).length === 0) {
     return res
@@ -42,13 +42,17 @@ app.post("/upload", function (req, res) {
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   let sampleFile = req.files.file;
   let newName = sampleFile.name;
-
+  let subdir = req.body.subdir;
+  console.log(subdir);
+  fs.ensureDirSync(`./${imageDirectoryPath}/${subdir ? subdir + "/" : ""}`);
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv(`./${imageDirectoryPath}/${newName}`, function (err) {
-    if (err) return res.status(500).send(err);
-
-    res.send({ success: true, message: "File uploaded!", uid: newName });
-  });
+  sampleFile.mv(
+    `./${imageDirectoryPath}/${subdir ? subdir + "/" : ""}${newName}`,
+    function (err) {
+      if (err) return res.status(500).send(err);
+      res.send({ success: true, message: "File uploaded!", uid: newName });
+    }
+  );
 });
 
 function gatherAllImages(basePath) {

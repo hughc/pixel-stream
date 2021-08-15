@@ -1,7 +1,8 @@
 import { Component } from "react";
 import { useSetRecoilState } from "recoil";
 import { clientFetching } from "../recoil/clients";
-const API_BASE_URL = "http://localhost:3001";
+import { API_BASE_URL } from "../recoil/images";
+
 const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
 const CLIENT_LIST_URL = `${API_BASE_URL}/clients`;
 

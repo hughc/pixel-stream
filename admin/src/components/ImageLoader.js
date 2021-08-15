@@ -6,7 +6,6 @@ import { IMAGE_UPLOAD_URL } from "../recoil/images";
 
 export default function ImageLoader() {
   // the file handles
-  const [uploads, setuploads] = useState([]);
   const [form, setForm] = useState({ uploadDir: "" });
   const [error, setError] = useState("");
   // the img tags generated from them
@@ -38,30 +37,38 @@ export default function ImageLoader() {
   };
 
   const dealWithUploads = async function (rawFileHandles) {
-    setuploads(rawFileHandles);
     const promises = _.map(rawFileHandles, (upload) => {
       return new Promise((resolve) => {
         const reader = new FileReader();
 
         reader.onabort = () => console.log("file reading was aborted");
         reader.onerror = () => console.log("file reading has failed");
-        reader.onload = () => resolve(reader.result);
+        reader.onload = () =>
+          resolve({ uid: upload.path, file: upload, uri: reader.result });
         reader.readAsDataURL(upload);
       });
     });
     let result;
     await Promise.all(promises).then((allDataURIs) => {
-      result = _.map(allDataURIs, (fileContent, fileIndex) => (
-        <img key={fileIndex} src={fileContent} />
-      ));
+      result = _.map(allDataURIs, (resultObj, fileIndex) => {
+        return {
+          uid: resultObj.uid,
+          element: (
+            <img alt={resultObj.uid} key={fileIndex} src={resultObj.uri} />
+          ),
+          file: resultObj.file,
+        };
+      });
     });
+    console.log({ result });
     setuploadedImages(result);
   };
   const uploadSelectedFiles = async () => {
-    const promises = _.map(uploads, (rawFileHandle) => {
+    const promises = _.map(uploadedImages, ({ file }) => {
       const formData = new FormData();
-      formData.append("file", rawFileHandle);
-      console.log(rawFileHandle);
+      formData.append("subdir", form.uploadDir);
+      formData.append("file", file);
+      console.log(`form.uploadDir: ${form.uploadDir}`);
       const request = new Request(IMAGE_UPLOAD_URL, {
         method: "POST",
         body: formData,
@@ -71,7 +78,14 @@ export default function ImageLoader() {
       return fetch(request).then((res) => res.json());
     });
     Promise.all(promises).then((results) => {
-      console.log(results);
+      let newUploads = _.clone(uploadedImages);
+      _.each(results, (uploadResult) => {
+        newUploads = _.filter(
+          newUploads,
+          (upload) => upload.uid !== uploadResult.uid
+        );
+      });
+      setuploadedImages(newUploads);
     });
   };
   const emptyMessage = _.isEmpty(uploadedImages) ? (
@@ -114,7 +128,9 @@ export default function ImageLoader() {
               <input {...getInputProps()} />
               <div className="c-filedropzone-inner">
                 {isDragActive ? <p>Drop the files here ...</p> : emptyMessage}
-                <div className="upload">{uploadedImages}</div>
+                <div className="upload">
+                  {_.pluck(uploadedImages, "element")}
+                </div>
               </div>
             </div>
           </Col>
