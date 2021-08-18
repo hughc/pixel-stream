@@ -15,8 +15,7 @@ export function ImageSorter(props) {
   const [getFilter, setFilter] = useState("");
 
   useEffect(() => {
-    console.log(`useEffect setSelectedIds ${props.selectedImageIds}`);
-    setSelectedIds(props.selectedImageIds);
+    setSelectedIds(_.uniq(props.selectedImageIds));
   }, [props.selectedImageIds]);
 
   const handleFilter = function (e) {
@@ -31,14 +30,15 @@ export function ImageSorter(props) {
 
   const generateImages = (status) => {
     let source;
+    const uniqueSelected = _.uniq(selectedIds);
     if (status === "selected") {
       source = _.compact(
-        _.map(selectedIds, (id) => _.findWhere(getImages, { id }))
+        _.map(uniqueSelected, (id) => _.findWhere(getImages, { id }))
       );
     } else {
       source = _.filter(
         getImages,
-        (image) => selectedIds.indexOf(image.id) === -1
+        (image) => uniqueSelected.indexOf(image.id) === -1
       );
       if (getFilter.length > 2)
         source = _.filter(

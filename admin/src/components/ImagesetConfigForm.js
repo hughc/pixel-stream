@@ -135,7 +135,21 @@ export function ImagesetConfigForm(props) {
                 value={localState.duration}
               />
               <Form.Text className="text-muted">
-                Time long each image displays for.
+                Time each image displays for.
+              </Form.Text>
+            </Form.Group>
+          </Col>
+          <Col sm="2">
+            <Form.Group controlId="brightness">
+              <Form.Label>Pixel brightness</Form.Label>
+              <Form.Control
+                name="brightness"
+                onChange={inputChanged}
+                type="number"
+                value={localState.brightness}
+              />
+              <Form.Text className="text-muted">
+                Time each image displays for.
               </Form.Text>
             </Form.Group>
           </Col>
@@ -165,7 +179,7 @@ export function ImagesetConfigForm(props) {
             </Form.Group>
           </Col>
           <Col sm="2">
-            <Form.Group controlId="duration">
+            <Form.Group>
               <Button
                 variant="warning"
                 onClick={(e) => {

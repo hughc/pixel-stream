@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
+import { useResetRecoilState } from "recoil";
 import _ from "underscore";
-import { IMAGE_UPLOAD_URL } from "../recoil/images";
+import { imagesList, IMAGE_UPLOAD_URL } from "../recoil/images";
 
 export default function ImageLoader() {
   // the file handles
@@ -10,6 +11,7 @@ export default function ImageLoader() {
   const [error, setError] = useState("");
   // the img tags generated from them
   const [uploadedImages, setuploadedImages] = useState([]);
+  const resetImages = useResetRecoilState(imagesList);
   //the completed uploads
   const [uploadeds, setuploadeds] = useState([]);
 
@@ -77,16 +79,21 @@ export default function ImageLoader() {
 
       return fetch(request).then((res) => res.json());
     });
-    Promise.all(promises).then((results) => {
-      let newUploads = _.clone(uploadedImages);
-      _.each(results, (uploadResult) => {
-        newUploads = _.filter(
-          newUploads,
-          (upload) => upload.uid !== uploadResult.uid
-        );
+    Promise.all(promises)
+      .then((results) => {
+        let newUploads = _.clone(uploadedImages);
+        _.each(results, (uploadResult) => {
+          newUploads = _.filter(
+            newUploads,
+            (upload) => upload.uid !== uploadResult.uid
+          );
+        });
+        setuploadedImages(newUploads);
+      })
+      .then((result) => {
+        // force a refresh from the server;
+        resetImages();
       });
-      setuploadedImages(newUploads);
-    });
   };
   const emptyMessage = _.isEmpty(uploadedImages) ? (
     <p>Drag files here, or click to select files</p>

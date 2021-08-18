@@ -7,6 +7,7 @@ const cors = require("cors");
 let imageStatsCache = [];
 let imageDirectoryCache = [];
 
+// clear caches- next fetch will regenerate
 var pixelMap = [];
 const staticImageBaseURL = "/image-preview";
 const imageDirectoryPath = "img";
@@ -17,7 +18,7 @@ let gImagesets = fs.readJSONSync("./data/imagesets.json");
 var path = require("path");
 var app = express();
 app.use(cors());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("build"));
 //var bodyParser = require("body-parser");
 
 app.use(staticImageBaseURL, express.static(imageDirectoryPath));
@@ -29,6 +30,15 @@ app.use(express.json({ type: "application/json)" }));
 //app.use(bodyParser.json());
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
+/* 
+app.get("/", function (req, res) {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+ */
+
+const optionDefinitions = [{ name: "env", alias: "e", type: String }];
+const commandLineArgs = require("command-line-args");
+const options = commandLineArgs(optionDefinitions);
 
 app.post("/upload", function (req, res) {
   //console.log(req.files);
@@ -46,13 +56,19 @@ app.post("/upload", function (req, res) {
   console.log(subdir);
   fs.ensureDirSync(`./${imageDirectoryPath}/${subdir ? subdir + "/" : ""}`);
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv(
-    `./${imageDirectoryPath}/${subdir ? subdir + "/" : ""}${newName}`,
-    function (err) {
-      if (err) return res.status(500).send(err);
+  const shortPath = `${subdir ? subdir + "/" : ""}${newName}`;
+  const newPath = `./${imageDirectoryPath}/${shortPath}`;
+  sampleFile.mv(newPath, function (err) {
+    if (err) return res.status(500).send(err);
+    returnAnImageStat({ path: shortPath }).then((result) => {
+      imageStatsCache.push(result);
+      imageDirectoryCache.push(shortPath);
       res.send({ success: true, message: "File uploaded!", uid: newName });
-    }
-  );
+    });
+    // clear caches- next fetch will regenerate
+    /*  imageStatsCache = [];
+    imageDirectoryCache = []; */
+  });
 });
 
 function gatherAllImages(basePath) {
@@ -119,7 +135,14 @@ app.post("/clients", function (req, res) {
 
 app.post("/imageset", function (req, res) {
   console.log('app.post("/imageset"', req.body);
-  var imagesetData = _.pick(req.body, "id", "name", "duration", "images");
+  var imagesetData = _.pick(
+    req.body,
+    "id",
+    "name",
+    "duration",
+    "brightness",
+    "images"
+  );
   if (!imagesetData.id) {
     res.send({ success: false, error: "no client id supplied" });
     return;
@@ -210,7 +233,7 @@ app.get("/image", (req, res) => {
   });
   console.log(imageStatsCache[0]); */
 
-  var dataP = getImgPixelsBuffer(`${imageDirectoryPath}/${path}`, sizeInt);
+  var dataP = getImgPixelsBuffer(path, setup);
   return dataP.then((dataObj) => {
     //		console.log('data ' + dataObj.data);
     data = dataObj.data;
@@ -223,27 +246,24 @@ app.get("/image", (req, res) => {
     );
     //		console.log(rgb);
     var mappedRGB = [];
-    const pixelMap = calculateMatrix(size);
+    const pixelMap = calculateMatrix(setup);
     _.each(pixelMap, (toIndex, fromIndex) => {
       mappedRGB[toIndex] = rgb[fromIndex];
     });
     var flatRGB = _.flatten(mappedRGB);
-    /* console.log(`sending ${flatRGB.length} R, G & B values`);
+    console.log(`sending ${flatRGB.length} R, G & B values`);
     var hotPink = [40, 0, 40];
     var hotSomething = [40, 40, 0];
     var off = [0, 0, 0];
-    var sequence = [off, off, off, hotSomething];
-    var sequence2 = [hotPink, hotSomething];
+    var sequence = [off, off, off, hotSomething, hotPink, hotSomething];
+    var sequence2 = [hotPink, hotPink, hotSomething];
     mappedRGB = [];
     for (let looper = 0; looper < 128; looper++) {
       mappedRGB.push(sequence[looper % sequence.length]);
     }
     for (let looper = 0; looper < 64; looper++) {
-      mappedRGB.push(sequence[looper % sequence.length]);
+      mappedRGB.push([0, 0, 0]);
     }
-    for (let looper = 0; looper < 64; looper++) {
-      mappedRGB.push(sequence2[looper % sequence2.length]);
-    } */
     //res.send(_.flatten(mappedRGB).join(","));
     res.send(flatRGB.join(","));
   });
@@ -259,7 +279,7 @@ app.get("/images", (req, res) => {
   returnAllImageStats().then((output) => res.send(output));
 });
 
-const port = 3001;
+const port = options.env == "dev" ? 3001 : 80;
 app.listen(port, () =>
   console.log(`Example app listening at http://localhost:${port}`)
 );
@@ -289,25 +309,62 @@ function returnAllImageStats() {
     return output;
   });
 }
+function returnAnImageStat(imgObj) {
+  let { path } = imgObj;
+  return sharp(`${imageDirectoryPath}/${path}`)
+    .metadata()
+    .catch((err) => console.warn(`${path}: ${err}`))
+    .then(function (metadata) {
+      path = `${staticImageBaseURL}/${path}`;
 
-function calculateMatrix(size, startingPositionX, startingPositionY) {
+      return {
+        id: imgObj.path,
+        path,
+        ..._.pick(metadata, ["width", "height", "format", "hasAlpha"]),
+      };
+    })
+    .catch((err) => console.warn(`${path}: ${err}`));
+}
+
+function calculateMatrix(setup) {
+  size = setup.width;
   var rows = _.map(_.range(0, size), (index) => {
     var col = _.map(_.range(0, size), (colIndex) => {
       return colIndex + size * index;
     });
-    if (index % 2) col.reverse();
+    if (index % 2 && setup.zigzag) col.reverse();
     return col.reverse();
+    //return col;
   });
 
   return _.flatten(rows);
 }
 
-function getImgPixelsBuffer(img, size) {
-  var data = sharp(img)
-    .resize(size, size, { kernel: sharp.kernel.lanczos3 })
-    .flatten({ background: "#ffffff" })
-    .raw()
-    .toBuffer({ resolveWithObject: true });
+function getImgPixelsBuffer(img, setup) {
+  size = setup.width;
+  var promise = returnAnImageStat({ path: img })
+    .then((metadata) => {
+      return metadata;
+    })
+    .then((metadata) => {
+      const rotations = {
+        topleft: 90,
+        topright: 0,
+        bottomleft: 180,
+        bottomright: 270,
+      };
+      return sharp(`${imageDirectoryPath}/${img}`)
+        .resize(size, size, {
+          kernel:
+            size < metadata.width
+              ? sharp.kernel.lanczos3
+              : sharp.kernel.nearest,
+        })
+        .flatten({ background: "#ffffff" })
+        .rotate(rotations[setup.start] || 0)
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+    });
 
-  return data;
+  return promise;
 }
