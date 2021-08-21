@@ -1,7 +1,7 @@
 import { atom, selector } from "recoil";
 import _ from "underscore";
 
-export const API_BASE_URL = "http://localhost:3001";
+export const API_BASE_URL = "";
 export const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
 export const IMAGE_UPLOAD_URL = `${API_BASE_URL}/upload`;
 

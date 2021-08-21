@@ -19,11 +19,12 @@ FASTLED_USING_NAMESPACE
 //#define CLK_PIN   4
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
-#define SQUARE_SIZE "32"
-#define UID_STRING "max-32"
-#define NUM_LEDS 1024
+#define SQUARE_SIZE "16"
+#define UID_STRING "16tesst"
+#define NUM_LEDS 256
 
 #define BRIGHTNESS 12
+#define TIMING 5
 
 #define FRAMES_PER_SECOND 60
 
@@ -34,6 +35,8 @@ String helloURL = helloBase + "?id=" + UID_STRING + "&pixels=" + NUM_LEDS;
 String fullImageURL = "";
 
 CRGB leds[NUM_LEDS];
+CRGB sources[10][NUM_LEDS];
+uint source = 0;
 HTTPClient http;
 uint8_t RGBValues[NUM_LEDS * 3]; // string array to store the pixel RGB values
 
@@ -1249,6 +1252,7 @@ void setup()
 }
 
 // Loop function
+unsigned long lastImageChange;
 
 void loop()
 {
@@ -1262,8 +1266,9 @@ void loop()
 	// put your main code here, to run repeatedly
 	check_status();
 
-	EVERY_N_SECONDS(10)
+	if (millis() - lastImageChange >= (TIMING * 1000))
 	{
+		lastImageChange = millis();
 		getImage();
 		//    Serial.println("-- main loop --");
 		//  getImage();
@@ -1567,19 +1572,38 @@ void getImage()
 			green = RGBValues[whichRGB + 1];
 			blue = RGBValues[whichRGB + 2];
 
-			Serial.print(whichRGB);
-			Serial.print(": ");
-			Serial.print(red);
-			Serial.print(",");
-			Serial.print(green);
-			Serial.print(",");
-			Serial.println(blue);
+			//Serial.print(whichRGB);
+			//Serial.print(": ");
+			//Serial.print(red);
+			//Serial.print(",");
+			//Serial.print(green);
+			//Serial.print(",");
+			//Serial.println(blue);
 
-			leds[whichRGB / 3] = CRGB(red, green, blue);
+			sources[source][whichRGB / 3] = CRGB(red, green, blue);
 		}
 	}
 	Serial.println("done setting ");
 	Serial.println("------------");
 	Serial.println("");
-	FastLED.show();
+	//uint8_t ratio = beatsin8(5);
+	for (uint8_t ratio = 0; ratio < 255; ratio = ratio + 5)
+	{
+		for (int i = 0; i < NUM_LEDS; i++)
+		{
+			if (source == 0)
+			{
+
+				leds[i] = blend(sources[1][i], sources[0][i], ratio);
+			}
+			else
+			{
+				leds[i] = blend(sources[0][i], sources[1][i], ratio);
+			}
+		}
+		//	leds[i] = sources[source][i];
+		//FastLED.show();
+		FastLED.delay(1);
+	}
+	source = source == 0 ? 1 : 0;
 }
