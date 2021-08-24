@@ -7,6 +7,8 @@ const cors = require("cors");
 let imageStatsCache = [];
 let imageDirectoryCache = [];
 
+const metadataKeys = ["width", "height", "format", "hasAlpha", "pages"];
+
 // clear caches- next fetch will regenerate
 var pixelMap = [];
 const staticImageBaseURL = "/image-preview";
@@ -39,6 +41,10 @@ app.get("/", function (req, res) {
 const optionDefinitions = [{ name: "env", alias: "e", type: String }];
 const commandLineArgs = require("command-line-args");
 const options = commandLineArgs(optionDefinitions);
+
+// prime image cache
+
+returnAllImageStats();
 
 app.post("/upload", function (req, res) {
   //console.log(req.files);
@@ -208,7 +214,7 @@ app.get("/image", (req, res) => {
     console.warn(`imageset id ${imageset}`);
     imageset = gImagesets[0];
   }
-  let { images, index } = imageset;
+  let { images, index, duration, brightness } = imageset;
   var imageCount = images.length;
   if (_.isUndefined(index)) index = 0;
   if (index == imageCount) index = 0;
@@ -233,26 +239,37 @@ app.get("/image", (req, res) => {
   });
   console.log(imageStatsCache[0]); */
 
-  var dataP = getImgPixelsBuffer(path, setup);
-  return dataP.then((dataObj) => {
-    //		console.log('data ' + dataObj.data);
-    data = dataObj.data;
-    //data.reverse();
-    var rgb = _.compact(
-      _.map(data, (dp, index) => {
-        if (index % 3) return;
-        return [dp, data[index + 1], data[index + 2]];
-      })
-    );
-    //		console.log(rgb);
-    var mappedRGB = [];
-    const pixelMap = calculateMatrix(setup);
-    _.each(pixelMap, (toIndex, fromIndex) => {
-      mappedRGB[toIndex] = rgb[fromIndex];
-    });
-    var flatRGB = _.flatten(mappedRGB);
-    console.log(`sending ${flatRGB.length} R, G & B values`);
-    var hotPink = [40, 0, 40];
+  const pixelBufferOp = getImgPixelsBuffer(path, setup);
+  const metadata = _.findWhere(imageStatsCache, { id: path });
+  let pages;
+  console.log({ metadata });
+  return pixelBufferOp.then((result) => {
+    if (metadata.pages > 1) {
+      pages = _.pluck(result, "data");
+    } else {
+      pages = [result.data];
+    }
+    const outputArray = _.first(
+      _.map(pages, (data, pageIndex) => {
+        //		console.log('data ' + dataObj.data);
+        //data.reverse();
+        var rgb = _.compact(
+          _.map(data, (dp, index) => {
+            if (index % 3) return;
+            return [dp, data[index + 1], data[index + 2]];
+          })
+        );
+        //		console.log(rgb);
+        var mappedRGB = [];
+        const pixelMap = calculateMatrix(setup);
+        _.each(pixelMap, (toIndex, fromIndex) => {
+          mappedRGB[toIndex] = rgb[fromIndex];
+        });
+        var flatRGB = _.flatten(mappedRGB);
+        flatRGB.unshift("page", pageIndex + 1);
+        // console.log(`page ${pageIndex}: sending ${flatRGB.length} R, G & B values`);
+        return flatRGB;
+        /* var hotPink = [40, 0, 40];
     var hotSomething = [40, 40, 0];
     var off = [0, 0, 0];
     var sequence = [off, off, off, hotSomething, hotPink, hotSomething];
@@ -263,9 +280,21 @@ app.get("/image", (req, res) => {
     }
     for (let looper = 0; looper < 64; looper++) {
       mappedRGB.push([0, 0, 0]);
-    }
-    //res.send(_.flatten(mappedRGB).join(","));
-    res.send(flatRGB.join(","));
+    } */
+      }),
+      4
+    );
+    // add extra metadata
+    outputArray.unshift(
+      "brightness",
+      brightness || 25,
+      "duration",
+      duration || 10,
+      "totalPages",
+      pages.length
+    );
+    res.contentType("text/plain");
+    res.send(_.flatten(outputArray).join(","));
   });
 });
 
@@ -299,16 +328,18 @@ function returnAllImageStats() {
             id: imgObj.path,
             path,
             created,
-            ..._.pick(metadata, ["width", "height", "format", "hasAlpha"]),
+            ..._.pick(metadata, metadataKeys),
           });
         })
         .catch((err) => console.warn(`${path}: ${err}`));
     })
   ).then((results) => {
     imageStatsCache = output;
+    console.log(`imageStatsCache has ${output.length} entries`);
     return output;
   });
 }
+
 function returnAnImageStat(imgObj) {
   let { path } = imgObj;
   return sharp(`${imageDirectoryPath}/${path}`)
@@ -320,7 +351,7 @@ function returnAnImageStat(imgObj) {
       return {
         id: imgObj.path,
         path,
-        ..._.pick(metadata, ["width", "height", "format", "hasAlpha"]),
+        ..._.pick(metadata, metadataKeys),
       };
     })
     .catch((err) => console.warn(`${path}: ${err}`));
@@ -353,17 +384,40 @@ function getImgPixelsBuffer(img, setup) {
         bottomleft: 180,
         bottomright: 270,
       };
-      return sharp(`${imageDirectoryPath}/${img}`)
-        .resize(size, size, {
-          kernel:
-            size < metadata.width
-              ? sharp.kernel.lanczos3
-              : sharp.kernel.nearest,
-        })
-        .flatten({ background: "#ffffff" })
-        .rotate(rotations[setup.start] || 0)
-        .raw()
-        .toBuffer({ resolveWithObject: true });
+      if (metadata.pages > 1) {
+        const operations = _.map(_.range(1, metadata.pages), (page) => {
+          return sharp(`${imageDirectoryPath}/${img}`, { page: page })
+            .resize(size, size, {
+              kernel:
+                size < metadata.width
+                  ? sharp.kernel.lanczos3
+                  : sharp.kernel.nearest,
+            })
+            .flatten({ background: "#ffffff" })
+            .rotate(rotations[setup.start] || 0)
+            .raw()
+            .toBuffer({ resolveWithObject: true })
+            .then({
+              onfulfilled: (result) => {
+                return { metadata, result };
+              },
+            });
+        });
+        return Promise.all(operations);
+      } else {
+        return sharp(`${imageDirectoryPath}/${img}`)
+          .resize(size, size, {
+            kernel:
+              size < metadata.width
+                ? sharp.kernel.lanczos3
+                : sharp.kernel.nearest,
+          })
+          .flatten({ background: "#ffffff" })
+          .rotate(rotations[setup.start] || 0)
+          .raw()
+          .toBuffer({ resolveWithObject: true })
+          .then((result) => result);
+      }
     });
 
   return promise;

@@ -2,8 +2,8 @@ import { Component } from "react";
 import BootstrapTable from "react-bootstrap-table-next";
 import _ from "underscore";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { API_BASE_URL } from "../recoil/constants";
 
-const API_BASE_URL = "http://localhost:3001";
 const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
 
 export class ImageTable extends Component {

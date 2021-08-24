@@ -6,7 +6,7 @@ import _ from "underscore";
 
 import { useRecoilState } from "recoil";
 import { imagesList } from "../recoil/images.js";
-import { API_BASE_URL } from "../recoil/images.js";
+import { API_BASE_URL } from "../recoil/constants";
 
 export function ImageSorter(props) {
   const [getImages] = useRecoilState(imagesList);

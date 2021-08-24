@@ -8,5 +8,18 @@
 			"path": ".."
 		}
 	],
-  "settings": {}
+	"settings": {
+		"files.associations": {
+			"*.html": "html",
+			"algorithm": "cpp",
+			"istream": "cpp",
+			"random": "cpp",
+			"vector": "cpp",
+			"xlocinfo": "cpp",
+			"xtree": "cpp",
+			"xutility": "cpp",
+			"*.tcc": "cpp",
+			"fstream": "cpp"
+		}
+	}
 }

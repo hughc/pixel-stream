@@ -1,5 +1,6 @@
 import { useRecoilState } from "recoil";
-import { anImage, API_BASE_URL } from "../recoil/images";
+import { API_BASE_URL } from "../recoil/constants";
+import { anImage } from "../recoil/images";
 
 export function Header(props) {
   const [anImageRef] = useRecoilState(anImage);

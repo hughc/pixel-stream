@@ -19,14 +19,14 @@ FASTLED_USING_NAMESPACE
 //#define CLK_PIN   4
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
-#define SQUARE_SIZE "16"
+#define SQUARE_SIZE "32"
 #define UID_STRING "16tesst"
 #define NUM_LEDS 256
-
-#define BRIGHTNESS 12
-#define TIMING 5
+#define NUM_FRAMES 5
 
 #define FRAMES_PER_SECOND 60
+
+uint8_t brightness = 12;
 
 String pixelServerUrl = "";
 String jsonURL = pixelServerUrl + "/image";
@@ -34,11 +34,16 @@ String helloBase = pixelServerUrl + "/checkin";
 String helloURL = helloBase + "?id=" + UID_STRING + "&pixels=" + NUM_LEDS;
 String fullImageURL = "";
 
+// the pixels
 CRGB leds[NUM_LEDS];
-CRGB sources[10][NUM_LEDS];
-uint source = 0;
+// sources
+CRGB sources[2][NUM_FRAMES][NUM_LEDS];
+int currentPage = 0;
+int totalPages = 1;
+int imageTiming = 5;
+int frameTiming = 1;
 HTTPClient http;
-uint8_t RGBValues[NUM_LEDS * 3]; // string array to store the pixel RGB values
+//uint8_t RGBValues[NUM_LEDS * 3 * 5]; // string array to store the pixel RGB values
 
 /****************************************************************************************************************************
   ConfigOnSwitchFS.ino
@@ -308,8 +313,8 @@ const char *CONFIG_FILE = "/ConfigSW.json";
 // Variables
 
 // Default configuration values
-char thingspeakApiKey[17] = "";
-bool sensorDht22 = true;
+//char thingspeakApiKey[17] = "";
+//bool sensorDht22 = true;
 
 #define PixelServerUrl_Label "pixelServerUrl"
 
@@ -941,7 +946,7 @@ void setup()
 	// FastLED.addLeds<LED_TYPE, DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
 	// set master brightness control
-	FastLED.setBrightness(BRIGHTNESS);
+	FastLED.setBrightness(brightness);
 
 	fill_solid(leds, NUM_LEDS, CRGB::Red);
 	//  fill_solid(blocks, , CRGB::Black);
@@ -1253,6 +1258,8 @@ void setup()
 
 // Loop function
 unsigned long lastImageChange;
+unsigned long lastFrameChange;
+bool imageRequested = false;
 
 void loop()
 {
@@ -1266,7 +1273,7 @@ void loop()
 	// put your main code here, to run repeatedly
 	check_status();
 
-	if (millis() - lastImageChange >= (TIMING * 1000))
+	if (millis() - lastImageChange >= (imageTiming * 1000))
 	{
 		lastImageChange = millis();
 		getImage();
@@ -1275,6 +1282,12 @@ void loop()
 
 		//    Serial.print("remaining heap: ");
 		//    Serial.println(ESP.getFreeHeap(), DEC);
+	}
+
+	if (millis() - lastFrameChange >= (frameTiming * 1000) && imageRequested)
+	{
+		lastFrameChange = millis();
+		changeFrame();
 	}
 }
 
@@ -1509,54 +1522,121 @@ void checkin()
 	// Send HTTP GET request
 }
 
-void getImage()
+char *requestImageFrames(int startFrame)
 {
 
-	// Send request
-
-	Serial.print("jsonURL: ");
-	Serial.println(fullImageURL);
+	Serial.print("requestImageFrames: ");
+	String pageURL = fullImageURL + "&page=" + startFrame;
+	Serial.println(pageURL);
 	// Your Domain name with URL path or IP address with path
-	http.begin(fullImageURL.c_str());
+	http.begin((pageURL).c_str());
 
 	// Send HTTP GET request
 	int httpResponseCode = http.GET();
 	Serial.print("HTTP Response code: ");
 	Serial.println(httpResponseCode);
 	String payload = http.getString();
-	//   Serial.println(payload);
-
 	// Free resources
 	http.end();
 
-	// Serial.print("total stream length: ");
-	// Serial.println(payload.length());
+	Serial.print("total stream length: ");
+	Serial.println(payload.length());
 
 	// Serial.println("remaining heap: ");
 	// Serial.println(ESP.getFreeHeap(), DEC);
 	//return;
 	char *cstr = new char[payload.length() + 1];
 	strcpy(cstr, payload.c_str());
+	return cstr;
+}
 
-	uint16_t foundValues = 0; // declaring i and assign  to 0
+// toggle between the nowo showing image and the next one
+int imageIndex = 0;
+
+void getImage()
+{
+
+	// Send request
+	char *cstr = requestImageFrames(0);
+
 	char *pt;
 	pt = strtok(cstr, ",");
+
+	int page = 0;
+	uint16_t whichRGB = 0;
+
 	while (pt != NULL)
 	{
-		int a = atoi(pt);
-		//   printf("%d: %d\n", i, a);
-		RGBValues[foundValues] = (uint8_t)a;
-		foundValues++;
+
+		//brightness
+		if (strcmp(pt, "brightness") == 0)
+		{
+			pt = strtok(NULL, ",");
+			int value = atoi(pt);
+			brightness = (uint8_t)value;
+			Serial.print("brightness: ");
+			Serial.println(brightness);
+		}
+		else if (strcmp(pt, "totalPages") == 0)
+		{
+			pt = strtok(NULL, ",");
+			totalPages = atoi(pt);
+			Serial.print("totalPages: ");
+			Serial.println(totalPages);
+			;
+		}
+		else if (strcmp(pt, "duration") == 0)
+		{
+			pt = strtok(NULL, ",");
+			imageTiming = atoi(pt);
+			Serial.print("imageTiming: ");
+			Serial.println(imageTiming);
+			;
+		}
+		else if (strcmp(pt, "page") == 0)
+		{
+			pt = strtok(NULL, ",");
+			page = atoi(pt) - 1;
+			// reset to read values
+			whichRGB = 0;
+			Serial.print("start page: ");
+			Serial.println(page);
+		}
+		else
+		//just reading triplets
+		{
+			int red = atoi(pt);
+			pt = strtok(NULL, ",");
+			int green = atoi(pt);
+			pt = strtok(NULL, ",");
+			int blue = atoi(pt);
+			if (page < NUM_FRAMES)
+				sources[imageIndex][page][whichRGB] = CRGB((uint8_t)red, (uint8_t)green, (uint8_t)blue);
+			if (totalPages == 1)
+			{
+				sources[imageIndex][page + 1][whichRGB] = CRGB((uint8_t)red, (uint8_t)green, (uint8_t)blue);
+			}
+
+			//   printf("%d: %d\n", i, a);
+			//	RGBValues[foundValues] = (uint8_t)a;
+			whichRGB++;
+		}
+		// next token
 		pt = strtok(NULL, ",");
+	}
+	if (totalPages > NUM_FRAMES)
+	{
+
+		Serial.println("some frame were dropped");
 	}
 
 	delete cstr;
 
-	Serial.print("stream parsed, found values: ");
-	Serial.println(foundValues);
+	Serial.println("stream parsed");
+	//Serial.println(foundValues);
 	Serial.print("remaining heap: ");
 	Serial.println(ESP.getFreeHeap(), DEC);
-
+	/* 
 	uint8_t red;
 	uint8_t green;
 	uint8_t blue;
@@ -1582,28 +1662,49 @@ void getImage()
 
 			sources[source][whichRGB / 3] = CRGB(red, green, blue);
 		}
-	}
+	} */
 	Serial.println("done setting ");
 	Serial.println("------------");
 	Serial.println("");
+	imageRequested = true;
+	changeImage();
+}
+
+void changeImage()
+{
+	int oldIndex = imageIndex == 0 ? 1 : 0;
 	//uint8_t ratio = beatsin8(5);
 	for (uint8_t ratio = 0; ratio < 255; ratio = ratio + 5)
 	{
 		for (int i = 0; i < NUM_LEDS; i++)
 		{
-			if (source == 0)
-			{
-
-				leds[i] = blend(sources[1][i], sources[0][i], ratio);
-			}
-			else
-			{
-				leds[i] = blend(sources[0][i], sources[1][i], ratio);
-			}
+			leds[i] = blend(sources[oldIndex][0][i], sources[imageIndex][0][i], ratio);
 		}
-		//	leds[i] = sources[source][i];
-		//FastLED.show();
 		FastLED.delay(1);
 	}
-	source = source == 0 ? 1 : 0;
+
+	Serial.print("changeImage() done, imageIndex: ");
+	Serial.println(imageIndex);
+	imageIndex = oldIndex;
+}
+
+void changeFrame()
+{
+	if (totalPages == 1)
+		return;
+	//uint8_t ratio = beatsin8(5);
+
+	currentPage = currentPage < totalPages ? currentPage + 1 : 0;
+	currentPage = currentPage < NUM_FRAMES ? currentPage : 0;
+
+	for (uint8_t ratio = 0; ratio < 255; ratio = ratio + 5)
+	{
+		for (int i = 0; i < NUM_LEDS; i++)
+			leds[i] = sources[imageIndex][currentPage][i];
+		//FastLED.show();
+	}
+	FastLED.delay(1);
+
+	Serial.print("changeFrame() done, currentFrame: ");
+	Serial.println(currentPage);
 }

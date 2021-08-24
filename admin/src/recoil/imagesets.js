@@ -1,6 +1,6 @@
 import { atom, selector } from "recoil";
 import _ from "underscore";
-import { API_BASE_URL } from "./images";
+import { API_BASE_URL } from "./constants";
 
 export const IMAGESET_API_URL = `${API_BASE_URL}/imagesets`;
 export const IMAGESET_API_URL_SINGULAR = `${API_BASE_URL}/imageset`;
