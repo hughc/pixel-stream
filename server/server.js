@@ -69,7 +69,12 @@ app.post("/upload", function (req, res) {
     returnAnImageStat({ path: shortPath }).then((result) => {
       imageStatsCache.push(result);
       imageDirectoryCache.push(shortPath);
-      res.send({ success: true, message: "File uploaded!", uid: newName });
+      res.send({
+        success: true,
+        message: "File uploaded!",
+        uid: newName,
+        stats: result,
+      });
     });
     // clear caches- next fetch will regenerate
     /*  imageStatsCache = [];
@@ -214,10 +219,10 @@ app.get("/image", (req, res) => {
     console.warn(`imageset id ${imageset}`);
     imageset = gImagesets[0];
   }
-  let { images, index, duration, brightness } = imageset;
+  let { images, index, duration, brightness, background } = imageset;
   var imageCount = images.length;
   if (_.isUndefined(index)) index = 0;
-  if (index == imageCount) index = 0;
+  if (index >= imageCount) index = 0;
   var path = images[index];
   /*  fileObj = _.findWhere(gatherAllImages(imageDirectoryPath), {
     path: filePath,
@@ -238,13 +243,13 @@ app.get("/image", (req, res) => {
     id: path,
   });
   console.log(imageStatsCache[0]); */
-
-  const pixelBufferOp = getImgPixelsBuffer(path, setup);
+  background = background || "#000000";
+  const pixelBufferOp = getImgPixelsBuffer(path, setup, background);
   const metadata = _.findWhere(imageStatsCache, { id: path });
   let pages;
-  console.log({ metadata });
+  //console.log({ metadata });
   return pixelBufferOp.then((result) => {
-    if (metadata.pages > 1) {
+    if (metadata && metadata.pages > 1) {
       pages = _.pluck(result, "data");
     } else {
       pages = [result.data];
@@ -286,10 +291,12 @@ app.get("/image", (req, res) => {
     );
     // add extra metadata
     outputArray.unshift(
-      "brightness",
-      brightness || 25,
+      "title",
+      path,
       "duration",
       duration || 10,
+      "brightness",
+      brightness || 25,
       "totalPages",
       pages.length
     );
@@ -371,8 +378,9 @@ function calculateMatrix(setup) {
   return _.flatten(rows);
 }
 
-function getImgPixelsBuffer(img, setup) {
-  size = setup.width;
+function getImgPixelsBuffer(img, setup, background) {
+  const size = setup.width;
+  //const background = setup.background || "#000000";
   var promise = returnAnImageStat({ path: img })
     .then((metadata) => {
       return metadata;
@@ -393,7 +401,7 @@ function getImgPixelsBuffer(img, setup) {
                   ? sharp.kernel.lanczos3
                   : sharp.kernel.nearest,
             })
-            .flatten({ background: "#ffffff" })
+            .flatten({ background: background })
             .rotate(rotations[setup.start] || 0)
             .raw()
             .toBuffer({ resolveWithObject: true })
@@ -412,7 +420,7 @@ function getImgPixelsBuffer(img, setup) {
                 ? sharp.kernel.lanczos3
                 : sharp.kernel.nearest,
           })
-          .flatten({ background: "#ffffff" })
+          .flatten({ background: background })
           .rotate(rotations[setup.start] || 0)
           .raw()
           .toBuffer({ resolveWithObject: true })
