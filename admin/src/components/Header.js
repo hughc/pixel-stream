@@ -1,5 +1,5 @@
 import { useRecoilState } from "recoil";
-import { API_BASE_URL } from "../recoil/constants";
+import { getBaseURL } from "../recoil/constants";
 import { anImage } from "../recoil/images";
 
 export function Header(props) {
@@ -14,7 +14,7 @@ export function Header(props) {
         >
           <img
             className="u-margin--right-20"
-            src={API_BASE_URL + anImageRef.path}
+            src={getBaseURL() + anImageRef.path}
             alt={anImageRef.path}
           />
           <h2 className="c-header-title u-margin--bottom-0">{props.title}</h2>

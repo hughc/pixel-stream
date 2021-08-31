@@ -1,19 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
-import { useResetRecoilState } from "recoil";
+import { useResetRecoilState, useSetRecoilState } from "recoil";
 import _ from "underscore";
 import { imagesList, IMAGE_UPLOAD_URL } from "../recoil/images";
 
 export default function ImageLoader() {
   // the file handles
   const [form, setForm] = useState({ uploadDir: "" });
-  const [error, setError] = useState("");
   // the img tags generated from them
   const [uploadedImages, setuploadedImages] = useState([]);
   const resetImages = useResetRecoilState(imagesList);
+  const setImages = useSetRecoilState(imagesList);
   //the completed uploads
-  const [uploadeds, setuploadeds] = useState([]);
 
   useEffect(() => {});
 
@@ -83,6 +82,12 @@ export default function ImageLoader() {
       .then((results) => {
         let newUploads = _.clone(uploadedImages);
         _.each(results, (uploadResult) => {
+          if (uploadResult.stats)
+            setImages((images) => {
+              const newImages = _.clone(images);
+              newImages.push(uploadResult.stats);
+              return newImages;
+            });
           newUploads = _.filter(
             newUploads,
             (upload) => upload.uid !== uploadResult.uid

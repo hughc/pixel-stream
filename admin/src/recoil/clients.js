@@ -1,8 +1,8 @@
 import { atom, selector } from "recoil";
 import _ from "underscore";
-import { API_BASE_URL } from "./constants";
+import { getBaseURL } from "./constants";
 
-export const CLIENT_API_URL = `${API_BASE_URL}/clients`;
+export const CLIENT_API_URL = `${getBaseURL()}/clients`;
 
 export const clientFetching = atom({
   key: "clientFetching",

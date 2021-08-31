@@ -1,10 +1,5 @@
 import { useRecoilState, useSetRecoilState } from "recoil";
-import {
-  editorImageset,
-  imagesetId,
-  imagesetsList,
-  IMAGESET_API_URL,
-} from "../recoil/imagesets";
+import { editorImageset, imagesetId, imagesetsList } from "../recoil/imagesets";
 import _ from "underscore";
 import { Button, Col, Form } from "react-bootstrap";
 import { ImageSorter } from "./ImageSorter";
@@ -20,7 +15,7 @@ export function ImagesetConfigForm(props) {
   const [localState, setLocalState] = useRecoilState(editorImageset);
   const [imagesetlistData, imagesetsListSetter] = useRecoilState(imagesetsList);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-  const [getClients, setClients] = useRecoilState(clientsList);
+  const [getClients] = useRecoilState(clientsList);
   const setCurrentId = useSetRecoilState(imagesetId);
   const inputChanged = function (e) {
     let newValue =

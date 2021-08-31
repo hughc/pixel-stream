@@ -2,9 +2,9 @@ import { Component } from "react";
 import BootstrapTable from "react-bootstrap-table-next";
 import _ from "underscore";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { API_BASE_URL } from "../recoil/constants";
+import { getBaseURL } from "../recoil/constants";
 
-const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
+const IMAGE_LIST_URL = `${getBaseURL()}/images`;
 
 export class ImageTable extends Component {
   constructor(props) {
@@ -49,7 +49,7 @@ export class ImageTable extends Component {
               {...provided.dragHandleProps}
               class="a-list-image"
               alt={image.img.replace(/.png|.gif|.jpg/g, "")}
-              src={`${API_BASE_URL}${image.path}`}
+              src={`${getBaseURL()}${image.path}`}
             />
           </li>
         )}

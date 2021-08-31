@@ -1,9 +1,9 @@
 import { atom, selector } from "recoil";
 import _ from "underscore";
-import { API_BASE_URL } from "./constants";
+import { getBaseURL } from "./constants";
 
-export const IMAGESET_API_URL = `${API_BASE_URL}/imagesets`;
-export const IMAGESET_API_URL_SINGULAR = `${API_BASE_URL}/imageset`;
+export const IMAGESET_API_URL = `${getBaseURL()}/imagesets`;
+export const IMAGESET_API_URL_SINGULAR = `${getBaseURL()}/imageset`;
 
 export const imagesetFetching = atom({
   key: "imagesetFetching",

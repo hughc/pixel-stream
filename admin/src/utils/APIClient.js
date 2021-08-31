@@ -1,10 +1,10 @@
 import { Component } from "react";
 import { useSetRecoilState } from "recoil";
 import { clientFetching } from "../recoil/clients";
-import { API_BASE_URL } from "../recoil/constants";
+import { getBaseURL } from "../recoil/constants";
 
-const IMAGE_LIST_URL = `${API_BASE_URL}/images`;
-const CLIENT_LIST_URL = `${API_BASE_URL}/clients`;
+const IMAGE_LIST_URL = `${getBaseURL()}/images`;
+const CLIENT_LIST_URL = `${getBaseURL()}/clients`;
 
 export function ApiClientWrapper() {
   const clientFetchingSetter = useSetRecoilState(clientFetching);

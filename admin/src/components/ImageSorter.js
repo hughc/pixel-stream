@@ -6,7 +6,8 @@ import _ from "underscore";
 
 import { useRecoilState } from "recoil";
 import { imagesList } from "../recoil/images.js";
-import { API_BASE_URL } from "../recoil/constants";
+import { getBaseURL } from "../recoil/constants";
+import { Button, ToggleButtonGroup } from "react-bootstrap";
 
 export function ImageSorter(props) {
   const [getImages] = useRecoilState(imagesList);
@@ -56,7 +57,7 @@ export function ImageSorter(props) {
           <img
             className="c-draggable-image"
             alt={image.id.replace(/.png|.gif|.jpg/g, "")}
-            src={`${API_BASE_URL}${image.path}`}
+            src={`${getBaseURL()}${image.path}`}
           />
         </Draggable>
       );
@@ -65,6 +66,10 @@ export function ImageSorter(props) {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
+      <ToggleButtonGroup className="mb-2">
+        <Button>Add &amp; Remove</Button>
+        <Button>Re-Order</Button>
+      </ToggleButtonGroup>
       <div className="c-draggable-list">
         <div className="c-draggable-list-header">
           <div className="c-draggable-list-label">Selected Images</div>
