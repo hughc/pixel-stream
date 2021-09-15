@@ -5,6 +5,9 @@ import { Button, Col, Form } from "react-bootstrap";
 import { ImageSorter } from "./ImageSorter";
 import { ConfirmationModal } from "./ConfirmationModal";
 import { useState } from "react";
+
+import { ChromePicker } from "react-color";
+
 import {
   deleteImageSetFromServer,
   saveImageSetsToServer,
@@ -17,6 +20,13 @@ export function ImagesetConfigForm(props) {
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [getClients] = useRecoilState(clientsList);
   const setCurrentId = useSetRecoilState(imagesetId);
+
+  const handleColorChange = (color) => {
+    inputChanged({
+      target: { type: "color", name: "backgroundColor", value: color.hex },
+    });
+  };
+
   const inputChanged = function (e) {
     let newValue =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
@@ -155,6 +165,8 @@ export function ImagesetConfigForm(props) {
               <Form.Label>Show this playlist on these clients:</Form.Label>
               {getClients.map((client) => (
                 <Form.Check
+                  id={client.name}
+                  key={client.name}
                   type="checkbox"
                   label={client.name}
                   name="selectedClient"
@@ -162,6 +174,16 @@ export function ImagesetConfigForm(props) {
                   value={client.id}
                 />
               ))}
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group className="sm-3" controlId="colorPicker">
+              <Form.Label>Background colour</Form.Label>
+              <ChromePicker
+                alpha={false}
+                color={localState.backgroundColor || "#000000"}
+                onChange={handleColorChange}
+              />
             </Form.Group>
           </Col>
         </Form.Row>
@@ -191,6 +213,7 @@ export function ImagesetConfigForm(props) {
         <ImageSorter
           selectedImageIds={localState.images}
           changeCallback={imageSelectionChanged}
+          backgroundColor={localState.backgroundColor || "#000000"}
         />
       </Form>
       <ConfirmationModal

@@ -219,7 +219,7 @@ app.get("/image", (req, res) => {
     console.warn(`imageset id ${imageset}`);
     imageset = gImagesets[0];
   }
-  let { images, index, duration, brightness, background } = imageset;
+  let { images, index, duration, brightness, backgroundColor } = imageset;
   var imageCount = images.length;
   if (_.isUndefined(index)) index = 0;
   if (index >= imageCount) index = 0;
@@ -243,8 +243,8 @@ app.get("/image", (req, res) => {
     id: path,
   });
   console.log(imageStatsCache[0]); */
-  background = background || "#000000";
-  const pixelBufferOp = getImgPixelsBuffer(path, setup, background);
+  backgroundColor = backgroundColor || "#000000";
+  const pixelBufferOp = getImgPixelsBuffer(path, setup, backgroundColor);
   const metadata = _.findWhere(imageStatsCache, { id: path });
   let pages;
   //console.log({ metadata });
@@ -401,7 +401,7 @@ function getImgPixelsBuffer(img, setup, background) {
                   ? sharp.kernel.lanczos3
                   : sharp.kernel.nearest,
             })
-            .flatten({ background: background })
+            .flatten({ background })
             .rotate(rotations[setup.start] || 0)
             .raw()
             .toBuffer({ resolveWithObject: true })

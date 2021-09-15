@@ -2,6 +2,10 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"name": "IR code learner",
+			"path": "..\\Wemos IR test\\IR code learner"
 		}
 	],
 	"settings": {
