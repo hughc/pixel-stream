@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "command-line-usage": "^6.1.1",
     "react-beautiful-dnd": "^13.1.0",
     "recoil": "^0.3.1"
   }

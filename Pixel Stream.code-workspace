@@ -6,6 +6,10 @@
 		{
 			"name": "IR code learner",
 			"path": "..\\Wemos IR test\\IR code learner"
+		},
+		{
+			"name": "client-wifi-portal",
+			"path": "client-wifi-portal"
 		}
 	],
 	"settings": {

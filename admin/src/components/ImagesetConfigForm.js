@@ -153,9 +153,7 @@ export function ImagesetConfigForm(props) {
                 type="number"
                 value={localState.brightness}
               />
-              <Form.Text className="text-muted">
-                Time each image displays for.
-              </Form.Text>
+              <Form.Text className="text-muted">1-255</Form.Text>
             </Form.Group>
           </Col>
         </Form.Row>

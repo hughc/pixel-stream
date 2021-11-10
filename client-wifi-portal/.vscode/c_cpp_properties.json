@@ -8,8 +8,8 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "C:/Users/Hugh/Documents/PlatformIO/Projects/210811-213952-d1_mini/include",
-                "C:/Users/Hugh/Documents/PlatformIO/Projects/210811-213952-d1_mini/src",
+                "C:/projects/pixel-stream/client-wifi-portal/include",
+                "C:/projects/pixel-stream/client-wifi-portal/src",
                 "C:/Users/Hugh/Documents/Arduino/libraries/ESP_WiFiManager/src",
                 "C:/Users/Hugh/Documents/Arduino/libraries/ESP_DoubleResetDetector/src",
                 "C:/Users/Hugh/.platformio/packages/framework-arduinoespressif8266/libraries/LittleFS/src",
@@ -33,6 +33,8 @@
                 "C:/Users/Hugh/Documents/Arduino/libraries/Adafruit_ST7735_and_ST7789_Library",
                 "C:/Users/Hugh/Documents/Arduino/libraries/Adafruit_seesaw_Library",
                 "C:/Users/Hugh/Documents/Arduino/libraries/HID-Project/src",
+                "C:/Users/Hugh/Documents/Arduino/libraries/IRMP/src",
+                "C:/Users/Hugh/Documents/Arduino/libraries/IRremoteESP8266/src",
                 "C:/Users/Hugh/Documents/Arduino/libraries/Json_Streaming_Parser",
                 "C:/Users/Hugh/Documents/Arduino/libraries/LEDMatrix",
                 "C:/Users/Hugh/Documents/Arduino/libraries/LEDText",
@@ -68,8 +70,8 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "C:/Users/Hugh/Documents/PlatformIO/Projects/210811-213952-d1_mini/include",
-                    "C:/Users/Hugh/Documents/PlatformIO/Projects/210811-213952-d1_mini/src",
+                    "C:/projects/pixel-stream/client-wifi-portal/include",
+                    "C:/projects/pixel-stream/client-wifi-portal/src",
                     "C:/Users/Hugh/Documents/Arduino/libraries/ESP_WiFiManager/src",
                     "C:/Users/Hugh/Documents/Arduino/libraries/ESP_DoubleResetDetector/src",
                     "C:/Users/Hugh/.platformio/packages/framework-arduinoespressif8266/libraries/LittleFS/src",
@@ -93,6 +95,8 @@
                     "C:/Users/Hugh/Documents/Arduino/libraries/Adafruit_ST7735_and_ST7789_Library",
                     "C:/Users/Hugh/Documents/Arduino/libraries/Adafruit_seesaw_Library",
                     "C:/Users/Hugh/Documents/Arduino/libraries/HID-Project/src",
+                    "C:/Users/Hugh/Documents/Arduino/libraries/IRMP/src",
+                    "C:/Users/Hugh/Documents/Arduino/libraries/IRremoteESP8266/src",
                     "C:/Users/Hugh/Documents/Arduino/libraries/Json_Streaming_Parser",
                     "C:/Users/Hugh/Documents/Arduino/libraries/LEDMatrix",
                     "C:/Users/Hugh/Documents/Arduino/libraries/LEDText",
@@ -127,7 +131,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=50101",
+                "PLATFORMIO=50203",
                 "ESP8266",
                 "ARDUINO_ARCH_ESP8266",
                 "ARDUINO_ESP8266_WEMOS_D1MINI",

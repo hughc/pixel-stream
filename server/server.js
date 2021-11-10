@@ -4,6 +4,45 @@ const fs = require("fs-extra");
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
+
+const commandLineArgs = require("command-line-args");
+const commandLineUsage = require("command-line-usage");
+
+const optionDefinitions = [
+  {
+    name: "port",
+    type: Number,
+    multiple: false,
+    typeLabel: "<port number>",
+    description: "server port - defaults to 80",
+  },
+  {
+    name: "env",
+    alias: "e",
+    type: String,
+    description: "environment - dev starts server on dev port (3001)",
+  },
+  { name: "help", type: Boolean },
+];
+
+const sections = [
+  {
+    header: "Pixel art server",
+    content: "serves rgb values to multiple LED matrices.",
+  },
+  {
+    header: "Options",
+    optionList: optionDefinitions,
+  },
+];
+
+const usage = commandLineUsage(sections);
+
+const options = commandLineArgs(optionDefinitions);
+
+if (options.help) return console.log(usage);
+const port = options["port"] ? options.port : options.env == "dev" ? 3001 : 80;
+
 let imageStatsCache = [];
 let imageDirectoryCache = [];
 
@@ -37,10 +76,6 @@ app.get("/", function (req, res) {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
  */
-
-const optionDefinitions = [{ name: "env", alias: "e", type: String }];
-const commandLineArgs = require("command-line-args");
-const options = commandLineArgs(optionDefinitions);
 
 // prime image cache
 
@@ -315,9 +350,8 @@ app.get("/images", (req, res) => {
   returnAllImageStats().then((output) => res.send(output));
 });
 
-const port = options.env == "dev" ? 3001 : 80;
 app.listen(port, () =>
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`server app listening at http://localhost:${port}`)
 );
 
 function returnAllImageStats() {

@@ -20,8 +20,8 @@ FASTLED_USING_NAMESPACE
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
 #define SQUARE_SIZE "32"
-#define UID_STRING "16tesst"
-#define NUM_LEDS 256
+#define UID_STRING "max-32"
+#define NUM_LEDS 1024
 #define NUM_FRAMES 5
 
 #define FRAMES_PER_SECOND 60
@@ -1682,6 +1682,12 @@ void changeImage()
 		}
 		FastLED.delay(1);
 	}
+
+	for (int i = 0; i < NUM_LEDS; i++)
+	{
+		leds[i] = sources[imageIndex][0][i];
+	}
+	FastLED.show();
 
 	Serial.print("changeImage() done, imageIndex: ");
 	Serial.println(imageIndex);
