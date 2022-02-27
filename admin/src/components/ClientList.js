@@ -14,7 +14,7 @@ export function ClientList(props) {
     return (
       <div key={item.id} className="c-clients__single">
         <a href="clients-{item-id}" data-target={item.id} onClick={selector}>
-          {item.id}
+          {item.name} ({item.id})
         </a>
       </div>
     );

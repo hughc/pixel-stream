@@ -16,13 +16,24 @@ FASTLED_USING_NAMESPACE
 
 #define DATA_PIN D3
 
+// WS2815 - 220ns, 360ns, 220ns
+template <uint8_t DATA_PIN, EOrder RGB_ORDER = RGB>
+class WS2815Controller : public ClocklessController<DATA_PIN, C_NS(220), C_NS(360), C_NS(220), RGB_ORDER>
+{
+};
+
+template <uint8_t DATA_PIN, EOrder RGB_ORDER>
+class WS2815 : public WS2815Controller<DATA_PIN, RGB_ORDER>
+{
+};
+
 //#define CLK_PIN   4
-#define LED_TYPE WS2811
-#define COLOR_ORDER GRB
+#define LED_TYPE WS2815
+#define COLOR_ORDER RGB
 #define SQUARE_SIZE "32"
-#define UID_STRING "max-32"
+#define UID_STRING "32-square"
 #define NUM_LEDS 1024
-#define NUM_FRAMES 5
+#define NUM_FRAMES 2
 
 #define FRAMES_PER_SECOND 60
 
@@ -38,10 +49,14 @@ String fullImageURL = "";
 CRGB leds[NUM_LEDS];
 // sources
 CRGB sources[2][NUM_FRAMES][NUM_LEDS];
-int currentPage = 0;
-int totalPages = 1;
-int imageTiming = 5;
-int frameTiming = 1;
+int currentPages[2] = {0, 0};
+int totalPages[2] = {1, 1};
+int imageTimings[2] = {5, 5};
+int frameTimings[2] = {1, 1};
+
+// toggle between the now showing image and the next one
+int imageIndex = 0;
+
 HTTPClient http;
 //uint8_t RGBValues[NUM_LEDS * 3 * 5]; // string array to store the pixel RGB values
 
@@ -582,6 +597,23 @@ uint8_t connectMultiWiFi()
 	//////
 #endif
 
+	if ((digitalRead(TRIGGER_PIN) == LOW) || (digitalRead(TRIGGER_PIN2) == LOW))
+	{
+		fill_solid(leds, NUM_LEDS, CRGB::Yellow);
+		FastLED.show();
+		runConfigPortal();
+
+		if (ESP8266)
+		{
+			ESP.reset();
+		}
+		else
+		{
+
+			ESP.restart();
+		}
+	}
+
 	int i = 0;
 	status = wifiMulti.run();
 	delay(WIFI_MULTI_1ST_CONNECT_WAITING_MS);
@@ -608,6 +640,8 @@ uint8_t connectMultiWiFi()
 
 		if ((digitalRead(TRIGGER_PIN) == LOW) || (digitalRead(TRIGGER_PIN2) == LOW))
 		{
+			fill_solid(leds, NUM_LEDS, CRGB::Yellow);
+			FastLED.show();
 			runConfigPortal();
 		}
 
@@ -1273,7 +1307,7 @@ void loop()
 	// put your main code here, to run repeatedly
 	check_status();
 
-	if (millis() - lastImageChange >= (imageTiming * 1000))
+	if (millis() - lastImageChange >= (imageTimings[imageIndex] * 1000))
 	{
 		lastImageChange = millis();
 		getImage();
@@ -1284,7 +1318,7 @@ void loop()
 		//    Serial.println(ESP.getFreeHeap(), DEC);
 	}
 
-	if (millis() - lastFrameChange >= (frameTiming * 1000) && imageRequested)
+	if (millis() - lastFrameChange >= (frameTimings[imageIndex] * 250) && imageRequested)
 	{
 		lastFrameChange = millis();
 		changeFrame();
@@ -1550,9 +1584,6 @@ char *requestImageFrames(int startFrame)
 	return cstr;
 }
 
-// toggle between the nowo showing image and the next one
-int imageIndex = 0;
-
 void getImage()
 {
 
@@ -1565,9 +1596,17 @@ void getImage()
 	int page = 0;
 	uint16_t whichRGB = 0;
 
+	Serial.print("loading image at index ");
+	int newIndex = imageIndex == 0 ? 1 : 0;
+	Serial.println(newIndex);
+
 	while (pt != NULL)
 	{
 
+		/* 
+		Serial.print("pt: ");
+		Serial.println(pt);
+	 */
 		//brightness
 		if (strcmp(pt, "brightness") == 0)
 		{
@@ -1577,20 +1616,26 @@ void getImage()
 			Serial.print("brightness: ");
 			Serial.println(brightness);
 		}
+		if (strcmp(pt, "title") == 0)
+		{
+			pt = strtok(NULL, ",");
+			Serial.print("title: ");
+			Serial.println(pt);
+		}
 		else if (strcmp(pt, "totalPages") == 0)
 		{
 			pt = strtok(NULL, ",");
-			totalPages = atoi(pt);
+			totalPages[newIndex] = atoi(pt);
 			Serial.print("totalPages: ");
-			Serial.println(totalPages);
+			Serial.println(totalPages[newIndex]);
 			;
 		}
 		else if (strcmp(pt, "duration") == 0)
 		{
 			pt = strtok(NULL, ",");
-			imageTiming = atoi(pt);
+			imageTimings[newIndex] = atoi(pt);
 			Serial.print("imageTiming: ");
-			Serial.println(imageTiming);
+			Serial.println(imageTimings[newIndex]);
 			;
 		}
 		else if (strcmp(pt, "page") == 0)
@@ -1611,11 +1656,11 @@ void getImage()
 			pt = strtok(NULL, ",");
 			int blue = atoi(pt);
 			if (page < NUM_FRAMES)
-				sources[imageIndex][page][whichRGB] = CRGB((uint8_t)red, (uint8_t)green, (uint8_t)blue);
-			if (totalPages == 1)
+				sources[newIndex][page][whichRGB] = CRGB((uint8_t)red, (uint8_t)green, (uint8_t)blue);
+			/* if (totalPages[newIndex] == 1)
 			{
-				sources[imageIndex][page + 1][whichRGB] = CRGB((uint8_t)red, (uint8_t)green, (uint8_t)blue);
-			}
+				sources[newIndex][page + 1][whichRGB] = CRGB((uint8_t)red, (uint8_t)green, (uint8_t)blue);
+			} */
 
 			//   printf("%d: %d\n", i, a);
 			//	RGBValues[foundValues] = (uint8_t)a;
@@ -1624,7 +1669,7 @@ void getImage()
 		// next token
 		pt = strtok(NULL, ",");
 	}
-	if (totalPages > NUM_FRAMES)
+	if (totalPages[newIndex] > NUM_FRAMES)
 	{
 
 		Serial.println("some frame were dropped");
@@ -1667,11 +1712,15 @@ void getImage()
 	Serial.println("------------");
 	Serial.println("");
 	imageRequested = true;
-	changeImage();
+	changeImage(newIndex);
 }
 
-void changeImage()
+void changeImage(int newImageIndex)
 {
+
+	FastLED.setBrightness(brightness);
+
+	imageIndex = newImageIndex;
 	int oldIndex = imageIndex == 0 ? 1 : 0;
 	//uint8_t ratio = beatsin8(5);
 	for (uint8_t ratio = 0; ratio < 255; ratio = ratio + 5)
@@ -1691,26 +1740,24 @@ void changeImage()
 
 	Serial.print("changeImage() done, imageIndex: ");
 	Serial.println(imageIndex);
-	imageIndex = oldIndex;
 }
 
 void changeFrame()
 {
-	if (totalPages == 1)
+	if (totalPages[imageIndex] == 1)
 		return;
 	//uint8_t ratio = beatsin8(5);
 
-	currentPage = currentPage < totalPages ? currentPage + 1 : 0;
-	currentPage = currentPage < NUM_FRAMES ? currentPage : 0;
+	currentPages[imageIndex] = currentPages[imageIndex] < totalPages[imageIndex] - 1 ? currentPages[imageIndex] + 1 : 0;
+	currentPages[imageIndex] = currentPages[imageIndex] < NUM_FRAMES - 1 ? currentPages[imageIndex] : 0;
 
-	for (uint8_t ratio = 0; ratio < 255; ratio = ratio + 5)
-	{
-		for (int i = 0; i < NUM_LEDS; i++)
-			leds[i] = sources[imageIndex][currentPage][i];
-		//FastLED.show();
-	}
+	for (int i = 0; i < NUM_LEDS; i++)
+		leds[i] = sources[imageIndex][currentPages[imageIndex]][i];
+	//FastLED.show();
 	FastLED.delay(1);
 
-	Serial.print("changeFrame() done, currentFrame: ");
-	Serial.println(currentPage);
+	Serial.print("changeFrame() done, imageIndex ");
+	Serial.print(imageIndex);
+	Serial.print(", currentFrame: ");
+	Serial.println(currentPages[imageIndex]);
 }

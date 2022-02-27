@@ -7,7 +7,7 @@ import _ from "underscore";
 import { useRecoilState } from "recoil";
 import { imagesList } from "../recoil/images.js";
 import { getBaseURL } from "../recoil/constants";
-import { Tab, Tabs, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import { Row, Tab, Tabs } from "react-bootstrap";
 
 export function ImageSorter(props) {
   const [getImages] = useRecoilState(imagesList);
@@ -15,7 +15,7 @@ export function ImageSorter(props) {
   const [selectedIds, setSelectedIds] = useState([]);
   const [getFilter, setFilter] = useState("");
   const [getFolderFilter, setFolderFilter] = useState("");
-  const [getMode, setMode] = useState("");
+  const [setMode] = useState("");
 
   useEffect(() => {
     setSelectedIds(_.uniq(props.selectedImageIds));
@@ -32,13 +32,12 @@ export function ImageSorter(props) {
     _.compact(
       _.uniq(
         _.map(getImages, (name) =>
-          name.id.split("/").length == 1 ? false : name.id.split("/")[0]
+          name.id.split("/").length === 1 ? false : name.id.split("/")[0]
         )
       )
     );
 
   const handleFolderFilter = function (e) {
-    console.log("handleFolderFilter", e);
     setFolderFilter(e.target.value);
   };
   const clearFolderFilter = function (e) {
@@ -65,6 +64,11 @@ export function ImageSorter(props) {
           source,
           (item) => item.id.toLowerCase().indexOf(getFilter.toLowerCase()) > -1
         );
+      if (getFolderFilter !== "")
+        source = _.filter(
+          source,
+          (item) => item.id.indexOf(getFolderFilter) > -1
+        );
     }
     return _.map(source, (image) => {
       return (
@@ -86,7 +90,6 @@ export function ImageSorter(props) {
   };
 
   const setOperationMode = function (choice) {
-    console.log(`clicked: ${choice}`);
     setMode(choice);
   };
 
@@ -110,31 +113,47 @@ export function ImageSorter(props) {
           {/* all images */}
           <div className="c-draggable-list">
             <div className="c-draggable-list-header">
-              <div className="c-draggable-list-label">All Images</div>
-              <div className="c-draggable-list-filter">
-                Subdir:{" "}
-                <select onChange={handleFolderFilter} value={getFolderFilter}>
-                  {_.map(folders, (folder) => (
-                    <option>{folder}</option>
-                  ))}
-                </select>
-                <div
-                  className="c-draggable-list-filter-clear"
-                  onClick={clearFolderFilter}
-                >
-                  X
+              <Row>
+                <div className="c-draggable-list-label col-sm-12">
+                  All Images
                 </div>
-              </div>
-              <div className="c-draggable-list-filter">
-                Filter:{" "}
-                <input type="text" onChange={handleFilter} value={getFilter} />
-                <div
-                  className="c-draggable-list-filter-clear"
-                  onClick={clearFilter}
-                >
-                  X
+              </Row>
+              <Row>
+                <div className="c-draggable-list-filter col-sm-12 col-md-6">
+                  Subdir:{" "}
+                  <select
+                    className="u-flex--1"
+                    onChange={handleFolderFilter}
+                    value={getFolderFilter}
+                  >
+                    <option value="">-- all --</option>
+                    {_.map(folders, (folder) => (
+                      <option value={folder}>{folder}</option>
+                    ))}
+                  </select>
+                  <div
+                    className="c-draggable-list-filter-clear"
+                    onClick={clearFolderFilter}
+                  >
+                    X
+                  </div>
                 </div>
-              </div>
+                <div className="c-draggable-list-filter col-sm-12 col-md-6">
+                  Filter:{" "}
+                  <input
+                    type="text"
+                    onChange={handleFilter}
+                    value={getFilter}
+                    className="u-flex--1"
+                  />
+                  <div
+                    className="c-draggable-list-filter-clear"
+                    onClick={clearFilter}
+                  >
+                    X
+                  </div>
+                </div>
+              </Row>
             </div>
             <Droppable dropId="allImages" className="drop-zone">
               <div className="c-draggable-list-items">
@@ -148,7 +167,7 @@ export function ImageSorter(props) {
         </DndContext>
       </Tab>
       <Tab eventKey="reorder" title="Re-Order">
-        here
+        <p>This feature not implemented yet</p>
       </Tab>
     </Tabs>
   );

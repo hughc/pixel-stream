@@ -1,26 +1,26 @@
 import { Button } from "react-bootstrap";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import _ from "underscore";
-import { formImageSet, imagesetId, imagesetsList } from "../recoil/imagesets";
+import { formPlaylist, playlistId, playlistsList } from "../recoil/playlists";
 
-export function ImagesetList(props) {
-  const imagesets = useRecoilValue(imagesetsList);
-  const imagesetIdSetter = useSetRecoilState(imagesetId);
-  const setCurrentFormData = useSetRecoilState(formImageSet);
+export function PlaylistList(props) {
+  const playlists = useRecoilValue(playlistsList);
+  const playlistIdSetter = useSetRecoilState(playlistId);
+  const setCurrentFormData = useSetRecoilState(formPlaylist);
 
   const selector = (e) => {
     e.preventDefault();
     // clear existing object
     setCurrentFormData({});
-    imagesetIdSetter((oldId) => parseInt(e.target.dataset.target));
+    playlistIdSetter((oldId) => parseInt(e.target.dataset.target));
   };
 
-  const newImageset = (e) => {
-    const currentHighestId = _.max(_.pluck(imagesets, "id"));
-    console.log(imagesets);
+  const newPlaylist = (e) => {
+    const currentHighestId = _.max(_.pluck(playlists, "id"));
+    console.log(playlists);
     // clear existing object
     setCurrentFormData({});
-    imagesetIdSetter((oldId) =>
+    playlistIdSetter((oldId) =>
       currentHighestId > 0 ? currentHighestId + 1 : 1
     );
   };
@@ -38,10 +38,10 @@ export function ImagesetList(props) {
   return (
     <div className="c-clients">
       <h4>Playlists:</h4>
-      <div>{imagesets.map(renderItem)}</div>
+      <div>{playlists.map(renderItem)}</div>
       <Button
         className="u-margin--top-20"
-        onClick={newImageset}
+        onClick={newPlaylist}
         variant="light"
         type="submit"
       >

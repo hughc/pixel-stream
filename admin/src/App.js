@@ -7,7 +7,7 @@ import LinkList from "./components/LinkList";
 import { Welcome } from "./components/Welcome";
 import ClientConfig from "./components/ClientConfig";
 import { RecoilRoot } from "recoil";
-import ImagesetConfig from "./components/ImagesetConfig";
+import PlaylistConfig from "./components/PlaylistConfig";
 import ImageLoader from "./components/ImageLoader";
 
 class App extends Component {
@@ -21,7 +21,7 @@ class App extends Component {
     console.log(`this.state.currentScreen: ${this.state.currentScreen}`);
     switch (this.state.currentScreen) {
       case "imagesorter":
-        mainContent = <ImagesetConfig />;
+        mainContent = <PlaylistConfig />;
         break;
       case "welcome":
         mainContent = <Welcome />;

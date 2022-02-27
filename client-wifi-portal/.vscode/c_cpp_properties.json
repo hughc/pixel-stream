@@ -8,8 +8,8 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "C:/projects/pixel-stream/client-wifi-portal/include",
-                "C:/projects/pixel-stream/client-wifi-portal/src",
+                "c:/projects/pixel-stream/client-wifi-portal/include",
+                "c:/projects/pixel-stream/client-wifi-portal/src",
                 "C:/Users/Hugh/Documents/Arduino/libraries/ESP_WiFiManager/src",
                 "C:/Users/Hugh/Documents/Arduino/libraries/ESP_DoubleResetDetector/src",
                 "C:/Users/Hugh/.platformio/packages/framework-arduinoespressif8266/libraries/LittleFS/src",
@@ -70,8 +70,8 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "C:/projects/pixel-stream/client-wifi-portal/include",
-                    "C:/projects/pixel-stream/client-wifi-portal/src",
+                    "c:/projects/pixel-stream/client-wifi-portal/include",
+                    "c:/projects/pixel-stream/client-wifi-portal/src",
                     "C:/Users/Hugh/Documents/Arduino/libraries/ESP_WiFiManager/src",
                     "C:/Users/Hugh/Documents/Arduino/libraries/ESP_DoubleResetDetector/src",
                     "C:/Users/Hugh/.platformio/packages/framework-arduinoespressif8266/libraries/LittleFS/src",
@@ -131,7 +131,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=50203",
+                "PLATFORMIO=50205",
                 "ESP8266",
                 "ARDUINO_ARCH_ESP8266",
                 "ARDUINO_ESP8266_WEMOS_D1MINI",

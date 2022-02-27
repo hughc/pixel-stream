@@ -3,6 +3,7 @@ import _ from "underscore";
 import { getBaseURL } from "./constants";
 
 export const CLIENT_API_URL = `${getBaseURL()}/clients`;
+export const CLIENT_PLAYLIST_API_URL = `${getBaseURL()}/client_playlists`;
 
 export const clientFetching = atom({
   key: "clientFetching",

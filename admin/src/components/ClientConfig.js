@@ -22,7 +22,7 @@ export default class ClientConfig extends Component {
         </div>
         <Container fluid className="u-h--1">
           <Row className="u-h--1">
-            <Col sm="2" className="sidebar u-pad--20">
+            <Col sm="12" md={3} className="sidebar u-pad--20">
               <Suspense fallback={<div>Loading...</div>}>
                 <ClientList
                   onClientSelect={this.onClientSelect.bind(this)}

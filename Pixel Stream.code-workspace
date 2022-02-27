@@ -10,6 +10,10 @@
 		{
 			"name": "client-wifi-portal",
 			"path": "client-wifi-portal"
+		},
+		{
+			"name": "210811-213952-d1_mini",
+			"path": "..\\..\\Users\\Hugh\\Documents\\PlatformIO\\Projects\\210811-213952-d1_mini"
 		}
 	],
 	"settings": {

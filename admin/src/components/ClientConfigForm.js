@@ -1,13 +1,14 @@
 import { useRecoilState } from "recoil";
-import { clientObject, clientsList, CLIENT_API_URL } from "../recoil/clients";
+import { clientObject, clientsList } from "../recoil/clients";
 import _ from "underscore";
 import { Button, Col, Form } from "react-bootstrap";
-import { imagesetsList } from "../recoil/imagesets";
+import { playlistsList } from "../recoil/playlists";
+import { saveClientsToServer } from "../utils/Actions";
 
 export function ClientConfigForm(props) {
   const [clientObjectData] = useRecoilState(clientObject);
   const [clientlistData, clientsListSetter] = useRecoilState(clientsList);
-  const [imagesets] = useRecoilState(imagesetsList);
+  const [playlists] = useRecoilState(playlistsList);
 
   const inputChanged = function (e) {
     const allClientData = clientlistData.slice();
@@ -29,17 +30,8 @@ export function ClientConfigForm(props) {
   const handleSubmit = async (e) => {
     // nothing to gather, just send it
     e.preventDefault();
-
-    const request = new Request(CLIENT_API_URL, {
-      method: "POST",
-      body: JSON.stringify(clientObjectData),
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
-
-    const returnedData = await fetch(request).then((res) => res.json());
+    const request = saveClientsToServer(clientObjectData);
+    const returnedData = request().then((res) => res.json());
     console.log(returnedData);
     //setClientSelector(returnedData);
   };
@@ -180,15 +172,14 @@ export function ClientConfigForm(props) {
                 onChange={inputChanged}
                 value={clientObjectData.imagesetId}
               >
-                {imagesets.map((imageset, index) => (
-                  <option key={index} value={imageset.id}>
-                    {imageset.name}
+                {playlists.map((playlist, index) => (
+                  <option key={index} value={playlist.id}>
+                    {playlist.name}
                   </option>
                 ))}
               </Form.Control>
               <Form.Text className="text-muted">
-                Do the rows imagesetId? If false, they are assumed to start at
-                the same end.
+                Choose the playlist to show on this screen.
               </Form.Text>
             </Form.Group>
           </Col>

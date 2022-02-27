@@ -36,19 +36,20 @@ html {
     border-radius: 20px;
     margin-bottom: 10px;
     &-header {
-      display: flex;
       padding: 10px;
-      justify-content: space-between;
     }
     &-filter {
       display: flex;
       position: relative;
-      input {
+      justify-content: space-between;
+      align-items: center;
+      input,
+      select {
         margin-left: 10px;
       }
       &-clear {
         position: absolute;
-        right: 5px;
+        right: 20px;
         top: 8px;
         color: white;
         background-color: #555;
@@ -60,6 +61,7 @@ html {
         justify-content: center;
         line-height: 1em;
         font-size: 10px;
+        cursor: pointer;
       }
     }
     &-items {
@@ -69,6 +71,7 @@ html {
   &-image {
     width: 32px;
     height: auto;
+    touch-action: none;
   }
   margin: 5px;
   background: #fff;
