@@ -55,4 +55,4 @@ The software consists of 3 parts:
 To start the server:
  - with nodejs installed, run `yarn` from within the server directory to load dependencies
  - from within the same dir run `node ./server.js` to start the server. Use the `--port xxxx` switch to choose a port to run it on
- - if you wish to run the server at system startup, I recommend installing [pm2](https://github.com/Unitech/pm2), the node process manager. You can then add the server process to pm2 with the command `pm2 start server.js --node-args="--port 9001"`   
+ - if you wish to run the server at system startup, I recommend installing [pm2](https://github.com/Unitech/pm2), the node process manager. You can then add the server process to pm2 with the command `pm2 start server.js --node-args="--port xxxx"`   
